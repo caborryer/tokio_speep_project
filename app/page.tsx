@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import DinoLoader from "@/components/DinoLoader";
 import styles from "@/components/Home.module.css";
+import { PRELAUNCH } from "@/lib/siteConfig";
 
 /** Cambia aquí el texto de apoyo (en el diseño es un Lorem ipsum de relleno). */
 const COPY = [
@@ -43,6 +44,9 @@ function Pic({ src, w, h, className = "", priority }: PicProps) {
 }
 
 export default function Home() {
+  // Prelanzamiento: solo el juego de Manuel (ver lib/siteConfig.ts)
+  if (PRELAUNCH) return <DinoLoader persistent />;
+
   return (
     <div className={styles.home}>
       {/* Loader de inicio: juego tipo dinosaurio de Chrome con Manuel (KAPLAY) */}
@@ -69,7 +73,7 @@ export default function Home() {
         {/* Manuel */}
         <div className={styles.hero}>
         <div className={`${styles.abs} ${styles.estrella}`} aria-hidden="true">
-          <Pic src="/home/estrella.svg" w={492} h={514} />
+          <Pic src="/home/estrella.svg" w={492} h={514} priority />
         </div>
         <div className={`${styles.abs} ${styles.manu}`}>
           <Image

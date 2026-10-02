@@ -26,10 +26,14 @@ type Props = {
   assets?: string[];
   /** Tiempo mínimo en pantalla (ms) para que se alcance a ver la animación. */
   minDuration?: number;
+  /** Modo prelanzamiento: el juego queda como pantalla permanente (no hay barra ni cierre). */
+  persistent?: boolean;
 };
 
-export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 5000 }: Props) {
-  const [phase, setPhase] = useState<"loading" | "leaving" | "done">(hasShown ? "done" : "loading");
+export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000, persistent = false }: Props) {
+  const [phase, setPhase] = useState<"loading" | "leaving" | "done">(
+    !persistent && hasShown ? "done" : "loading",
+  );
 
   const canvasWrapRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
@@ -53,7 +57,7 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 5000
 
   // ---------- Juego (KAPLAY) ----------
   useEffect(() => {
-    if (hasShown) return;
+    if (hasShown && !persistent) return;
     const wrap = canvasWrapRef.current;
     if (!wrap) return;
 
@@ -108,7 +112,7 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 5000
 
   // ---------- Progreso real de carga ----------
   useEffect(() => {
-    if (hasShown) return;
+    if (persistent || hasShown) return;
 
     const start = performance.now();
     let loadedAssets = 0;
@@ -174,7 +178,7 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 5000
       if (leaveTimer) clearTimeout(leaveTimer);
       window.removeEventListener("load", onLoad);
     };
-  }, [assets, minDuration]);
+  }, [assets, minDuration, persistent]);
 
   if (phase === "done") return null;
 
@@ -206,16 +210,23 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 5000
         </div>
 
         <div className={styles.progressRow}>
-          <div className={styles.bar}>
-            <div className={styles.fill} ref={fillRef} />
-          </div>
-          <span ref={labelRef}>RUNNING...</span>
+          {persistent ? (
+            <span ref={labelRef}>PRÓXIMAMENTE</span>
+          ) : (
+            <>
+              <div className={styles.bar}>
+                <div className={styles.fill} ref={fillRef} />
+              </div>
+              <span ref={labelRef}>RUNNING...</span>
+            </>
+          )}
         </div>
-      </div>
 
-      <div className={styles.message} ref={msgRef} aria-hidden="true">
-        <strong>GAME OVER</strong>
-        <span>TOCA O PRESIONA ESPACIO PARA REINTENTAR</span>
+        <div className={styles.message} ref={msgRef} aria-hidden="true">
+          <strong>GAME OVER</strong>
+          <span>TOCA O PRESIONA ESPACIO PARA REINTENTAR</span>
+        </div>
+
       </div>
 
       <div className={styles.hint} aria-hidden="true">

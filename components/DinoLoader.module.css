@@ -59,6 +59,7 @@
   gap: clamp(14px, 2.4vh, 26px);
   pointer-events: none;
   padding: 0 1rem;
+  --ts: clamp(40px, min(10.5vw, 15vh), 118px);
 }
 
 .title {
@@ -67,7 +68,7 @@
   font-weight: 700;
   text-transform: none;
   line-height: 0.82;
-  font-size: clamp(46px, 10.5vw, 118px);
+  font-size: var(--ts);
   text-shadow: 0 0 14px #050505, 0 0 6px #050505, 2px 2px 0 #050505;
   white-space: nowrap;
 }
@@ -99,7 +100,7 @@
 .tag {
   position: absolute;
   right: -3%;
-  bottom: -10%;
+  bottom: -26%;
   transform: rotate(-5deg);
   background: #ffe600;
   color: #000;
@@ -113,6 +114,8 @@
 }
 
 .progressRow {
+  /* deja pasar el letrero amarillo, que sobresale por debajo del título */
+  margin-top: calc(var(--ts) * 0.5);
   display: flex;
   align-items: center;
   gap: 14px;
@@ -154,11 +157,7 @@
 
 /* ---------- Mensajes ---------- */
 .message {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 44%;
-  z-index: 3;
+  /* Va dentro del encabezado, debajo de la barra: nunca se superpone con el título */
   text-align: center;
   font-family: 'Press Start 2P', var(--font-mono, monospace), monospace;
   pointer-events: none;
@@ -174,7 +173,7 @@
   display: block;
   font-size: clamp(16px, 3vw, 30px);
   font-weight: 400;
-  margin-bottom: 1.1em;
+  margin-bottom: 0.8em;
   text-shadow: 0 0 10px #050505;
 }
 
