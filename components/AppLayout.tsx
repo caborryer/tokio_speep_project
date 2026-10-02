@@ -2,10 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // El home trae su propia navegación (etiquetas amarillas), así que ocultamos el header global ahí.
+  const isHome = usePathname() === '/';
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -20,6 +23,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {!isHome && (
       <header className="app-header" style={{ zIndex: 60 }}>
         <div className="header-logo-container" style={{ position: 'relative', zIndex: 60 }}>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', lineHeight: '1', color: 'var(--text-primary)' }}>
@@ -59,9 +63,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </nav>
       </header>
+      )}
       
       {/* Mobile Nav Overlay */}
-      {isMobileMenuOpen && (
+      {!isHome && isMobileMenuOpen && (
         <nav className="hidden-desktop" style={{
           position: 'fixed',
           inset: 0,

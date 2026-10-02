@@ -1,0 +1,389 @@
+/* Fuentes: Amador (título gótico) y Futura (UI / textos). local() usa la Futura instalada si existe. */
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@500;700&display=swap');
+
+@font-face {
+  font-family: 'Amador TSP';
+  src: url('/fonts/amador.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Futura TSP';
+  font-weight: 500;
+  src: url('/fonts/futura-medium.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Futura TSP';
+  font-weight: 700;
+  src: url('/fonts/futura-bold.woff2') format('woff2');
+  font-display: swap;
+}
+
+.home {
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  min-height: 100vh;
+  background: #050505;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end; /* el escenario se ancla abajo: Manu siempre toca el borde inferior */
+  font-family: 'Futura TSP', 'Futura', 'Jost', 'Century Gothic', sans-serif;
+  color: #fff;
+}
+
+/* ---------- Capas de fondo ---------- */
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.bgFoto {
+  position: absolute;
+  inset: 0;
+  background: url('/home/foto.webp') center / cover no-repeat;
+  filter: grayscale(0.55) sepia(0.35) contrast(1.05) brightness(1.05);
+}
+.bgDegrado {
+  position: absolute;
+  inset: 0;
+  background: url('/home/degrado.webp') center / cover no-repeat;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.bgTopo {
+  position: absolute;
+  inset: 0;
+  background: url('/home/textura-topo.webp') center / cover no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.13;
+}
+.bgPuntos {
+  position: absolute;
+  inset: 0;
+  background: url('/home/textura-puntos.webp') center / cover no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.2;
+}
+
+/* ---------- Escenario 1920 x 1080 (todo escala con --u) ---------- */
+.stage {
+  --u: calc(100cqw / 1920);
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.abs {
+  position: absolute;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.line {
+  filter: invert(1);
+}
+
+/* Etiquetas amarillas (nav + botón) */
+.tag {
+  display: inline-block;
+  background: #fff600;
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  line-height: 1.05;
+  white-space: nowrap;
+  transition: transform 0.15s ease;
+}
+.tag:hover {
+  transform: rotate(0deg) scale(1.05) !important;
+}
+
+.nav {
+  position: absolute;
+  left: calc(var(--u) * 48);
+  top: calc(var(--u) * 72);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--u) * 19);
+  z-index: 5;
+}
+.nav .tag {
+  font-size: calc(var(--u) * 31);
+  padding: calc(var(--u) * 5) calc(var(--u) * 8);
+}
+.nav .tag:nth-child(1) { transform: rotate(0.4deg); }
+.nav .tag:nth-child(2) { transform: rotate(0.9deg); }
+.nav .tag:nth-child(3) { transform: rotate(1.8deg); margin-left: calc(var(--u) * 3); padding-right: calc(var(--u) * 22); }
+.nav .tag:nth-child(4) { transform: rotate(0.8deg); margin-left: calc(var(--u) * 4); }
+
+.donate {
+  position: absolute;
+  right: calc(var(--u) * 70);
+  top: calc(var(--u) * 52);
+  font-size: calc(var(--u) * 30);
+  padding: calc(var(--u) * 14) calc(var(--u) * 20);
+  transform: rotate(-1deg);
+  z-index: 5;
+}
+
+/* ---------- Personaje ---------- */
+.estrella {
+  left: calc(var(--u) * 256);
+  top: calc(var(--u) * 98);
+  width: calc(var(--u) * 563);
+  height: calc(var(--u) * 589);
+}
+.manu {
+  left: calc(var(--u) * 356);
+  top: calc(var(--u) * 162);
+  width: calc(var(--u) * 392);
+  height: calc(var(--u) * 918);
+}
+
+/* ---------- Título ---------- */
+.title {
+  position: absolute;
+  left: calc(var(--u) * 770);
+  top: calc(var(--u) * 70);
+  width: calc(var(--u) * 900);
+  height: calc(var(--u) * 370);
+  font-family: 'Amador TSP', 'UnifrakturCook', serif;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  margin: 0;
+  text-transform: none;
+}
+.title span {
+  position: absolute;
+  display: block;
+}
+.tEl { left: calc(var(--u) * 8); top: calc(var(--u) * 52); font-size: calc(var(--u) * 118); }
+.tReto { left: calc(var(--u) * 110); top: calc(var(--u) * -28); font-size: calc(var(--u) * 250); }
+.t500 { left: calc(var(--u) * 22); top: calc(var(--u) * 148); font-size: calc(var(--u) * 215); }
+.tKm { left: calc(var(--u) * 312); top: calc(var(--u) * 164); font-size: calc(var(--u) * 126); }
+.speed {
+  position: absolute;
+  left: calc(var(--u) * 1275);
+  top: calc(var(--u) * 338);
+  font-size: calc(var(--u) * 36);
+  padding: calc(var(--u) * 26) calc(var(--u) * 16) calc(var(--u) * 20);
+  transform: rotate(-5.8deg);
+  z-index: 4;
+  text-transform: none;
+}
+
+.copy {
+  position: absolute;
+  left: calc(var(--u) * 853);
+  top: calc(var(--u) * 464);
+  width: calc(var(--u) * 850);
+  margin: 0;
+  font-weight: 500;
+  font-size: calc(var(--u) * 32.5);
+  line-height: 1.17;
+  letter-spacing: 0;
+}
+
+/* ---------- Mapa ---------- */
+.map {
+  position: absolute;
+  left: calc(var(--u) * 110);
+  top: calc(var(--u) * 635);
+  width: calc(var(--u) * 1700);
+  height: calc(var(--u) * 430);
+}
+.map > * {
+  position: absolute;
+}
+.mRoute { left: calc(var(--u) * 290); top: calc(var(--u) * 87); width: calc(var(--u) * 1305); height: calc(var(--u) * 195); }
+.mStar { left: calc(var(--u) * 273); top: calc(var(--u) * 150); width: calc(var(--u) * 48); height: calc(var(--u) * 46); }
+.mSanta { left: calc(var(--u) * 10); top: calc(var(--u) * 135); width: calc(var(--u) * 268); height: calc(var(--u) * 118); }
+.mCity { left: calc(var(--u) * 635); top: calc(var(--u) * 258); width: calc(var(--u) * 238); height: calc(var(--u) * 73); }
+.mDeath { left: calc(var(--u) * 820); top: calc(var(--u) * 33); width: calc(var(--u) * 325); height: calc(var(--u) * 184); }
+.mBubble { left: calc(var(--u) * 1145); top: calc(var(--u) * 20); width: calc(var(--u) * 206); height: calc(var(--u) * 184); }
+.mVegas { left: calc(var(--u) * 1515); top: calc(var(--u) * 7); width: calc(var(--u) * 182); height: calc(var(--u) * 180); }
+
+.brand {
+  left: calc(var(--u) * 1145);
+  top: calc(var(--u) * 20);
+  width: calc(var(--u) * 206);
+  height: calc(var(--u) * 150);
+  display: grid;
+  place-items: center;
+  color: #000;
+  font-weight: 700;
+  font-size: calc(var(--u) * 50);
+  letter-spacing: -0.02em;
+}
+.brand .i {
+  position: relative;
+}
+.brand .i::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--u) * -4);
+  width: calc(var(--u) * 9);
+  height: calc(var(--u) * 9);
+  margin-left: calc(var(--u) * -4.5);
+  border-radius: 50%;
+  background: #e30613;
+}
+
+/* ---------- Datos ---------- */
+.stats {
+  position: absolute;
+  left: calc(var(--u) * 1285);
+  top: calc(var(--u) * 930);
+  width: calc(var(--u) * 600);
+  height: calc(var(--u) * 130);
+}
+.stats > * {
+  position: absolute;
+}
+.sBrujula { left: calc(var(--u) * 5); top: calc(var(--u) * 5); width: calc(var(--u) * 86); height: calc(var(--u) * 110); }
+.sEnc { left: calc(var(--u) * 164); top: calc(var(--u) * 17); width: calc(var(--u) * 103); height: calc(var(--u) * 103); }
+.sFicha { left: calc(var(--u) * 405); top: calc(var(--u) * 15); width: calc(var(--u) * 95); height: calc(var(--u) * 95); }
+.sTxt { font-weight: 700; line-height: 1.02; white-space: nowrap; }
+.sKm { left: calc(var(--u) * 97); top: calc(var(--u) * 44); font-size: calc(var(--u) * 33); }
+.sTemp { left: calc(var(--u) * 260); top: calc(var(--u) * 50); font-size: calc(var(--u) * 33); }
+.sTemp small { display: block; font-size: calc(var(--u) * 21); margin-top: calc(var(--u) * 3); }
+.sGoal { left: calc(var(--u) * 505); top: calc(var(--u) * 48); font-size: calc(var(--u) * 26); }
+
+/* Contenedores que en escritorio no generan caja (todo se posiciona sobre el escenario) */
+.hero,
+.titleBox,
+.mapWrap {
+  display: contents;
+}
+.line1 {
+  display: block;
+}
+
+/* ---------- Móvil / tablet: composición apilada ---------- */
+@container (max-width: 899px) {
+  .stage {
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px 0 44px;
+    gap: 22px;
+  }
+
+  .nav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 16px;
+    padding-right: 150px; /* deja espacio al botón Dona ahora */
+  }
+  .nav .tag,
+  .nav .tag:nth-child(n) {
+    font-size: clamp(13px, 4vw, 17px);
+    padding: 4px 8px;
+    margin: 0;
+  }
+  .donate {
+    position: absolute;
+    right: 16px;
+    top: 18px;
+    font-size: clamp(13px, 4vw, 17px);
+    padding: 8px 12px;
+  }
+
+  .hero {
+    display: block;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    margin-top: 6px;
+  }
+  .estrella {
+    left: 8%;
+    top: 0;
+    width: 76%;
+    height: auto;
+    aspect-ratio: 563 / 589;
+  }
+  .manu {
+    left: 29%;
+    top: 4%;
+    width: 40%;
+    height: auto;
+    aspect-ratio: 392 / 918;
+  }
+
+  .titleBox {
+    display: block;
+    position: relative;
+    --u: calc(100cqw / 960);
+    width: calc(var(--u) * 900);
+    height: calc(var(--u) * 400);
+    margin: 0 auto;
+  }
+  .title {
+    left: 0;
+    top: 0;
+  }
+  .speed {
+    left: calc(var(--u) * 505);
+    top: calc(var(--u) * 268);
+  }
+
+  .copy {
+    position: static;
+    width: auto;
+    padding: 0 20px;
+    font-size: clamp(15px, 4.2vw, 19px);
+    line-height: 1.4;
+  }
+  .copy span {
+    display: inline;
+  }
+
+  .mapWrap {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .mapWrap::-webkit-scrollbar {
+    display: none;
+  }
+  .map {
+    position: relative;
+    left: 0;
+    top: 0;
+    --u: calc(100cqw / 1000);
+    margin: 0 12px;
+    flex: none;
+  }
+
+  .stats {
+    position: relative;
+    left: 0;
+    top: 0;
+    --u: calc(100cqw / 680);
+    margin: 0 auto;
+  }
+}
+
+@container (min-width: 900px) {
+  .copy span {
+    display: block;
+  }
+}

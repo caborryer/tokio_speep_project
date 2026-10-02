@@ -28,7 +28,7 @@ type Props = {
   minDuration?: number;
 };
 
-export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 4000 }: Props) {
+export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 5000 }: Props) {
   const [phase, setPhase] = useState<"loading" | "leaving" | "done">(hasShown ? "done" : "loading");
 
   const canvasWrapRef = useRef<HTMLDivElement>(null);
@@ -38,6 +38,8 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 4000
   const hiRef = useRef<HTMLSpanElement>(null);
   const msgRef = useRef<HTMLDivElement>(null);
   const bestRef = useRef(0);
+  /** Momento en que el juego empezó a correr (el tiempo mínimo se cuenta desde ahí). */
+  const gameStartRef = useRef<number | null>(null);
 
   // Bloquea el scroll de la página mientras el loader está visible
   useEffect(() => {
@@ -70,6 +72,9 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 4000
     let stop: (() => void) | undefined;
 
     startDinoGame(canvas, {
+      onReady: () => {
+        gameStartRef.current = performance.now();
+      },
       onScore: (s) => {
         if (scoreRef.current) scoreRef.current.textContent = pad(s);
       },
@@ -141,7 +146,12 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 4000
     };
 
     const tick = () => {
-      const elapsed = performance.now() - start;
+      const now = performance.now();
+      // El tiempo mínimo cuenta desde que el juego arranca, para que siempre alcancen a jugar.
+      // Si el juego no logra iniciar en 6 s, se usa el reloj de la página como respaldo.
+      const playStart = gameStartRef.current ?? (now - start > 6000 ? start : now);
+      const elapsed = now - playStart;
+      const sinceStart = now - start;
       const assetsFrac = assets.length ? loadedAssets / assets.length : 1;
       const real = assetsFrac * 0.8 + (fontsReady ? 0.1 : 0) + (windowLoaded ? 0.1 : 0);
       // La barra nunca va más rápido que el tiempo mínimo, ni más allá de lo realmente cargado
@@ -150,7 +160,7 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 4000
       if (target >= 1 && shown > 0.995) shown = 1;
       if (fillRef.current) fillRef.current.style.width = `${(shown * 100).toFixed(1)}%`;
 
-      if (shown >= 1 || elapsed > MAX_MS) {
+      if (shown >= 1 || sinceStart > MAX_MS) {
         if (fillRef.current) fillRef.current.style.width = "100%";
         finish();
         return;

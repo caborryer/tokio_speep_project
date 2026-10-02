@@ -1,4 +1,11 @@
+/**
+ * Juego tipo "dinosaurio de Chrome" con Manuel, hecho con KAPLAY.
+ * Se importa de forma dinámica para que nunca corra en el servidor (SSR).
+ */
+
 export type DinoCallbacks = {
+  /** Los sprites ya cargaron y el juego empieza a correr. */
+  onReady?: () => void;
   /** Se llama cuando cambia el puntaje visible (entero). */
   onScore?: (score: number) => void;
   /** Manuel chocó con un cactus. */
@@ -73,7 +80,7 @@ export async function startDinoGame(
   let lift = 0; // altura sobre el suelo (px, >= 0)
   let stepT = 0;
   let dustT = 0;
-  let spawnIn = 1.6;
+  let spawnIn = 0.05; // el primer cactus sale en cuanto Manuel termina de entrar
   let introT = 0;
   let deadAt = 0;
 
@@ -170,32 +177,29 @@ export async function startDinoGame(
       vy = -JUMP_V;
     }
   };
-  const cutJump = () => {
-    // salto corto si sueltan rápido la tecla
-    if (vy < -380) vy = -380;
-  };
-
-  // Teclado a nivel de ventana: KAPLAY solo escucha teclas si el canvas tiene el foco,
-  // y aquí el canvas nunca lo recibe. Así Espacio / ↑ / W funcionan siempre.
+  // Un toque rápido de tecla siempre da el salto completo (sin salto variable).
   const isJumpKey = (e: KeyboardEvent) =>
-    e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW";
+    e.code === "Space" ||
+    e.code === "ArrowUp" ||
+    e.code === "KeyW" ||
+    e.key === " " ||
+    e.key === "Spacebar" ||
+    e.key === "ArrowUp" ||
+    e.keyCode === 32;
   const onKeyDown = (e: KeyboardEvent) => {
     if (!isJumpKey(e)) return;
     e.preventDefault();
     if (!e.repeat) jump();
   };
-  const onKeyUp = (e: KeyboardEvent) => {
-    if (isJumpKey(e)) cutJump();
-  };
-  window.addEventListener("keydown", onKeyDown);
-  window.addEventListener("keyup", onKeyUp);
+  window.addEventListener("keydown", onKeyDown, true);
+  document.addEventListener("keydown", onKeyDown, true);
   k.onClick(jump);
 
   const restart = () => {
     k.destroyAll("obstacle");
     distance = 0;
     speed = START_SPEED;
-    spawnIn = 1.2;
+    spawnIn = 0.6;
     vy = 0;
     lift = 0;
     alive = true;
@@ -203,6 +207,8 @@ export async function startDinoGame(
     man.angle = 0;
     cb.onRestart?.();
   };
+
+  cb.onReady?.();
 
   // ---------- Loop principal ----------
   k.onUpdate(() => {
@@ -321,8 +327,8 @@ export async function startDinoGame(
   });
 
   return () => {
-    window.removeEventListener("keydown", onKeyDown);
-    window.removeEventListener("keyup", onKeyUp);
+    window.removeEventListener("keydown", onKeyDown, true);
+    document.removeEventListener("keydown", onKeyDown, true);
     try {
       k.quit();
     } catch {

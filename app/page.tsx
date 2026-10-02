@@ -1,138 +1,133 @@
 "use client";
 
-import React from 'react';
-import Link from 'next/link';
-import DinoLoader from '@/components/DinoLoader';
+import Image from "next/image";
+import Link from "next/link";
+import DinoLoader from "@/components/DinoLoader";
+import styles from "@/components/Home.module.css";
+
+/** Cambia aquí el texto de apoyo (en el diseño es un Lorem ipsum de relleno). */
+const COPY = [
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
+  "sed do eiusmod tempor incididunt ut labore et dolore",
+  "magna aliqua. Quis ipsum suspendisse ultrices gravida.",
+  "Risus commodo viverra maecenas accumsan lacus.",
+];
+
+/** Imágenes del home (se precargan mientras corre el loader). */
+const HOME_ASSETS = [
+  "/home/foto.webp",
+  "/home/manu.webp",
+  "/home/degrado.webp",
+  "/home/textura-topo.webp",
+  "/home/textura-puntos.webp",
+  "/home/estrella.svg",
+  "/home/linea-punteada.svg",
+];
+
+type PicProps = { src: string; w: number; h: number; className?: string; priority?: boolean };
+
+/** Imagen decorativa (los SVG/WebP ya vienen optimizados, por eso `unoptimized`). */
+function Pic({ src, w, h, className = "", priority }: PicProps) {
+  return (
+    <Image
+      src={src}
+      alt=""
+      width={w}
+      height={h}
+      unoptimized
+      priority={priority}
+      draggable={false}
+      className={`${styles.img} ${className}`}
+    />
+  );
+}
 
 export default function Home() {
   return (
-    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
-
+    <div className={styles.home}>
       {/* Loader de inicio: juego tipo dinosaurio de Chrome con Manuel (KAPLAY) */}
-      <DinoLoader />
-      
-      {/* Decorative Background Image */}
-      <div style={{
-        position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-        width: '100%',
-        backgroundImage: 'radial-gradient(circle at center, rgba(198, 241, 53, 0.05) 0%, transparent 60%)',
-        zIndex: -1,
-        overflow: 'hidden'
-      }}>
-        {/* Character image positioned on the right */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          right: 0,
-          width: '100%',
-          maxWidth: '600px',
-          height: '85vh',
-          background: 'url("/5.png") center bottom/contain no-repeat',
-          maskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)',
-          opacity: 0.9,
-          zIndex: 0
-        }} />
+      <DinoLoader assets={HOME_ASSETS} />
 
-        {/* Decorative text */}
-        <div className="neon-magenta text-fluid-deco" style={{ position: 'absolute', top: '15%', right: 'auto', left: '5%', fontFamily: 'var(--font-hand)', transform: 'rotate(-15deg)', zIndex: 0, opacity: 0.8 }}>
-          LOS<br/>ANGELES
-        </div>
-        <div className="neon-magenta text-fluid-deco" style={{ position: 'absolute', top: '25%', right: '5%', fontFamily: 'var(--font-hand)', transform: 'rotate(-10deg)', zIndex: 0, opacity: 0.8 }}>
-          LAS<br/>VEGAS
-        </div>
-        <div className="text-fluid-deco" style={{ position: 'absolute', bottom: '30%', right: '5%', fontFamily: 'var(--font-hand)', transform: 'rotate(10deg)', textAlign: 'right', color: '#fff', zIndex: 0, opacity: 0.8 }}>
-          LET'S<br/>RUN<br/>THIS<br/>TOGETHER
-        </div>
+      {/* Fondo: foto + degradado + texturas */}
+      <div className={styles.bg} aria-hidden="true">
+        <div className={styles.bgFoto} />
+        <div className={styles.bgDegrado} />
+        <div className={styles.bgTopo} />
+        <div className={styles.bgPuntos} />
       </div>
 
-      {/* Main Content */}
-      <div className="container" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', zIndex: 10, paddingTop: '120px' }}>
-        
-        <div style={{ maxWidth: '600px', marginTop: '10vh' }}>
-          <h1 className="text-fluid-title" style={{ marginBottom: '1rem', textShadow: '2px 2px 0px rgba(0,0,0,1)' }}>
-            500 KM.<br/>
-            UNA META.<br/>
-            MUCHOS QUE<br/>
-            LA CORREN.
-          </h1>
-          
-          <p className="font-mono text-fluid-subtitle" style={{ color: 'var(--text-secondary)', marginBottom: '2rem', letterSpacing: '1px', lineHeight: 1.5, fontSize: '0.8rem' }}>
-            EL PRIMER COLOMBIANO<br/>
-            EN COMPLETAR<br/>
-            THE SPEED PROJECT
-          </p>
+      <div className={styles.stage}>
+        {/* Navegación */}
+        <nav className={styles.nav} aria-label="Principal">
+          <Link href="/reto" className={styles.tag}>El Reto</Link>
+          <Link href="/dona" className={styles.tag}>Dona un km</Link>
+          <Link href="/manu" className={styles.tag}>Manu</Link>
+          <Link href="/marcas" className={styles.tag}>Marcas</Link>
+        </nav>
+        <Link href="/dona" className={`${styles.tag} ${styles.donate}`}>Dona ahora</Link>
 
-          <div className="flex-row-mobile gap-responsive" style={{ flexWrap: 'nowrap' }}>
-            <Link href="/dona" style={{
-              padding: '0.8rem 1rem',
-              backgroundColor: 'var(--accent-lime)',
-              color: 'var(--bg-primary)',
-              textDecoration: 'none',
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.8rem',
-              textTransform: 'uppercase',
-              textAlign: 'center',
-              whiteSpace: 'nowrap'
-            }}>
-              DONA UN KM
-            </Link>
-            <Link href="/reto" style={{
-              padding: '0.8rem 1rem',
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              border: '2px solid var(--text-primary)',
-              color: 'var(--text-primary)',
-              textDecoration: 'none',
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.8rem',
-              textTransform: 'uppercase',
-              textAlign: 'center',
-              whiteSpace: 'nowrap'
-            }}>
-              CONOCE EL RETO
-            </Link>
+        {/* Manuel */}
+        <div className={styles.hero}>
+        <div className={`${styles.abs} ${styles.estrella}`} aria-hidden="true">
+          <Pic src="/home/estrella.svg" w={492} h={514} />
+        </div>
+        <div className={`${styles.abs} ${styles.manu}`}>
+          <Image
+            src="/home/manu.webp"
+            alt="Manuel, corredor de The Speed Project"
+            width={413}
+            height={967}
+            unoptimized
+            priority
+            className={styles.img}
+          />
+        </div>
+        </div>
+
+        {/* Título */}
+        <div className={styles.titleBox}>
+        <h1 className={styles.title} aria-label="El Reto, 500 Kilómetros">
+          <span className={styles.tEl} aria-hidden="true">el</span>
+          <span className={styles.tReto} aria-hidden="true">Reto</span>
+          <span className={styles.t500} aria-hidden="true">500</span>
+          <span className={styles.tKm} aria-hidden="true">Kilometros</span>
+        </h1>
+        <div className={`${styles.tag} ${styles.speed}`}>The Speed Project</div>
+        </div>
+
+        <p className={styles.copy}>
+          {COPY.map((line) => (
+            <span key={line}>{line} </span>
+          ))}
+        </p>
+
+        {/* Mapa del recorrido */}
+        <div className={styles.mapWrap}>
+        <div className={styles.map} aria-hidden="true">
+          <div className={styles.mRoute}><Pic src="/home/linea-punteada.svg" w={1394} h={206} className={styles.line} /></div>
+          <div className={styles.mStar}><Pic src="/home/estrella-mapa.svg" w={347} h={331} /></div>
+          <div className={styles.mSanta}><Pic src="/home/santa-monica.svg" w={1037} h={457} className={styles.line} /></div>
+          <div className={styles.mCity}><Pic src="/home/city.svg" w={1390} h={426} className={styles.line} /></div>
+          <div className={styles.mDeath}><Pic src="/home/death-valley.svg" w={1140} h={646} className={styles.line} /></div>
+          <div className={styles.mBubble}><Pic src="/home/bocadillo.svg" w={657} h={588} /></div>
+          <div className={styles.brand}>
+            {/* Reemplaza este texto por el logo real de la marca (SVG) cuando lo tengas */}
+            <span>éx<span className={styles.i}>ı</span>to</span>
           </div>
+          <div className={styles.mVegas}><Pic src="/home/las-vegas.svg" w={680} h={672} className={styles.line} /></div>
+        </div>
+        </div>
+
+        {/* Datos */}
+        <div className={styles.stats}>
+          <div className={styles.sBrujula}><Pic src="/home/brujula.svg" w={92} h={118} /></div>
+          <div className={`${styles.sTxt} ${styles.sKm}`}>500<br />km</div>
+          <div className={styles.sEnc}><Pic src="/home/encendedor.svg" w={640} h={640} /></div>
+          <div className={`${styles.sTxt} ${styles.sTemp}`}>+50<small>Temperature</small></div>
+          <div className={styles.sFicha}><Pic src="/home/ficha.svg" w={1024} h={1024} /></div>
+          <div className={`${styles.sTxt} ${styles.sGoal}`}>The<br />Goal</div>
         </div>
       </div>
-
-      {/* Bottom Bar */}
-      <div className="container" style={{ paddingBottom: '2rem', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 10, gap: '2rem' }}>
-        
-        <div className="hidden-mobile" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-          SCROLL<br/>
-          <span style={{ fontSize: '1.2rem' }}>v</span>
-        </div>
-
-        {/* Data Badges */}
-        <div className="flex-wrap gap-responsive" style={{ display: 'flex', justifyContent: 'center', flex: 1 }}>
-          <div className="font-mono" style={{ textAlign: 'center' }}>
-            <div style={{ width: '32px', height: '32px', backgroundColor: 'var(--accent-lime)', maskImage: 'url("/trail.svg")', WebkitMaskImage: 'url("/trail.svg")', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', margin: '0 auto' }} />
-            <div style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginTop: '0.5rem' }}>500 KM</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>DISTANCIA</div>
-          </div>
-          <div className="font-mono" style={{ textAlign: 'center' }}>
-            <div style={{ width: '32px', height: '32px', backgroundColor: 'var(--accent-lime)', maskImage: 'url("/thermometer-hot.svg")', WebkitMaskImage: 'url("/thermometer-hot.svg")', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', margin: '0 auto' }} />
-            <div style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginTop: '0.5rem' }}>+50°C</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>TEMPERATURAS</div>
-          </div>
-          <div className="font-mono" style={{ textAlign: 'center' }}>
-            <div style={{ width: '32px', height: '32px', backgroundColor: 'var(--accent-lime)', maskImage: 'url("/mountains.svg")', WebkitMaskImage: 'url("/mountains.svg")', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', margin: '0 auto' }} />
-            <div style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginTop: '0.5rem' }}>DEATH VALLEY</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>TERRENO EXTREMO</div>
-          </div>
-          <div className="font-mono" style={{ textAlign: 'center' }}>
-            <div style={{ width: '32px', height: '32px', backgroundColor: 'var(--accent-lime)', maskImage: 'url("/conqueror.svg")', WebkitMaskImage: 'url("/conqueror.svg")', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', margin: '0 auto' }} />
-            <div style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginTop: '0.5rem' }}>30</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>ATLETAS</div>
-          </div>
-        </div>
-
-        <div className="font-mono" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textAlign: 'right', maxWidth: '150px' }}>
-          CORRER<br/>INSPIRA<br/>CONECTA<br/>TRANSFORMA
-        </div>
-      </div>
-      
     </div>
   );
 }
