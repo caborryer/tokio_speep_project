@@ -13,6 +13,7 @@
     "@react-three/fiber": "^9.7.0",
     "framer-motion": "^13.4.0",
     "gsap": "^3.15.0",
+    "kaplay": "^3001.0.19",
     "lucide-react": "^1.46.0",
     "next": "16.3.5",
     "react": "19.2.8",

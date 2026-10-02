@@ -2,10 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
+import DinoLoader from '@/components/DinoLoader';
 
 export default function Home() {
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+
+      {/* Loader de inicio: juego tipo dinosaurio de Chrome con Manuel (KAPLAY) */}
+      <DinoLoader />
       
       {/* Decorative Background Image */}
       <div style={{

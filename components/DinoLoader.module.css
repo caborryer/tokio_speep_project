@@ -1,0 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=UnifrakturCook:wght@700&display=swap');
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #050505;
+  color: #fff;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  cursor: pointer;
+  transition: opacity 0.7s ease, visibility 0.7s ease;
+}
+
+.leaving {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Cuadrícula sutil de fondo */
+.grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: center;
+}
+
+.canvasWrap {
+  position: absolute;
+  inset: 0;
+}
+
+/* KAPLAY fija el tamaño en px inline; lo sobreescribimos para que escale con la pantalla */
+.canvasWrap canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  outline: none;
+}
+
+/* ---------- Encabezado (título + barra) ---------- */
+.header {
+  position: absolute;
+  top: clamp(56px, 10vh, 110px);
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, 2.4vh, 26px);
+  pointer-events: none;
+  padding: 0 1rem;
+}
+
+.title {
+  position: relative;
+  font-family: 'UnifrakturCook', 'UnifrakturMaguntia', 'Old English Text MT', serif;
+  font-weight: 700;
+  text-transform: none;
+  line-height: 0.82;
+  font-size: clamp(46px, 10.5vw, 118px);
+  text-shadow: 0 0 14px #050505, 0 0 6px #050505, 2px 2px 0 #050505;
+  white-space: nowrap;
+}
+
+.line1,
+.line2 {
+  display: block;
+}
+
+.line1 {
+  padding-left: 0.1em;
+}
+
+.el {
+  font-size: 0.36em;
+  vertical-align: 0.95em;
+  margin-right: 0.08em;
+}
+
+.num {
+  font-size: 1.12em;
+  margin-right: 0.04em;
+}
+
+.km {
+  font-size: 0.62em;
+}
+
+.tag {
+  position: absolute;
+  right: -3%;
+  bottom: -10%;
+  transform: rotate(-5deg);
+  background: #ffe600;
+  color: #000;
+  font-family: var(--font-display, 'Archivo Black', sans-serif);
+  font-style: italic;
+  font-size: clamp(11px, 1.55vw, 17px);
+  line-height: 1;
+  padding: 0.35em 0.8em;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: 'Press Start 2P', var(--font-mono, monospace), monospace;
+  font-size: clamp(11px, 1.7vw, 17px);
+  letter-spacing: 1px;
+}
+
+.bar {
+  width: clamp(130px, 17vw, 250px);
+  height: clamp(18px, 2.6vw, 30px);
+  border: 3px solid #fff;
+  padding: 3px;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  background: repeating-linear-gradient(to right, #fff 0 10px, transparent 10px 13px);
+}
+
+/* ---------- HUD (HI 00613 00035) ---------- */
+.hud {
+  position: absolute;
+  top: clamp(14px, 3vh, 34px);
+  right: clamp(14px, 4vw, 70px);
+  z-index: 3;
+  display: flex;
+  gap: 1.4em;
+  font-family: 'Press Start 2P', var(--font-mono, monospace), monospace;
+  font-size: clamp(11px, 1.7vw, 18px);
+  letter-spacing: 1px;
+  pointer-events: none;
+}
+
+.hi {
+  opacity: 0.55;
+}
+
+/* ---------- Mensajes ---------- */
+.message {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 44%;
+  z-index: 3;
+  text-align: center;
+  font-family: 'Press Start 2P', var(--font-mono, monospace), monospace;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.message.show {
+  opacity: 1;
+}
+
+.message strong {
+  display: block;
+  font-size: clamp(16px, 3vw, 30px);
+  font-weight: 400;
+  margin-bottom: 1.1em;
+  text-shadow: 0 0 10px #050505;
+}
+
+.message span {
+  display: inline-block;
+  max-width: 90%;
+  padding: 0.7em 1em;
+  font-size: clamp(8px, 1.3vw, 13px);
+  line-height: 1.6;
+  background: rgba(5, 5, 5, 0.85);
+}
+
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(12px, 3vh, 30px);
+  z-index: 3;
+  text-align: center;
+  font-family: 'Press Start 2P', var(--font-mono, monospace), monospace;
+  font-size: clamp(8px, 1.1vw, 12px);
+  letter-spacing: 1px;
+  opacity: 0.55;
+  pointer-events: none;
+  animation: blink 1.4s steps(2, jump-none) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint {
+    animation: none;
+  }
+  .overlay {
+    transition-duration: 0.01s;
+  }
+}
