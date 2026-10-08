@@ -1,139 +1,69 @@
-"use client";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import Icon from "@/components/scene/Icon";
+import { Lines, LOREM_3 } from "@/components/scene/Lorem";
+import Scene from "@/components/scene/Scene";
+import v from "@/components/scene/Views.module.css";
 
-import React, { useState } from 'react';
-import MorphGallery from '@/components/ui/morph-gallery';
+export const metadata: Metadata = {
+  title: "Manuel Agudelo | El Reto 500 Kilómetros",
+  description: "Conoce a Manuel Agudelo, el corredor detrás de El Reto 500 Kilómetros.",
+};
+
+/** Foto dentro del polaroid. Para cambiarla, reemplaza /public/scene/photos/manu-retrato.webp. */
+const PORTRAIT = "/scene/photos/manu-retrato.webp";
 
 export default function ManuPage() {
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const ITEMS = [
-    { src: '/6.png' },
-    { src: '/1.png' },
-    { src: '/2.png' },
-    { src: '/3.png' },
-    { src: '/4.png' }
-  ];
-
   return (
-    <div className="container" style={{ display: 'flex', flexDirection: 'column', paddingTop: '150px' }}>
-      
-      <div className="flex-col-mobile gap-responsive" style={{ alignItems: 'flex-start' }}>
-        
-        {/* Profile Image Area */}
-        <div style={{ flex: 1, position: 'relative', width: '100%' }}>
-          <div style={{
-            width: '100%',
-            aspectRatio: '3/4',
-            filter: 'grayscale(100%)',
-            maskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)',
-            overflow: 'hidden'
-          }}>
-            <MorphGallery 
-              items={ITEMS} 
-              index={activeIndex} 
-              onIndexChange={setActiveIndex}
-              height="100%" 
-              thumbnails={false} 
-              arrows={false} 
-              autoplay={0}
-            />
+    <Scene
+      bg="manu"
+      map={{
+        star: { l: 975, t: 872 },
+        head: { l: 607, t: 730, w: 120 },
+        bubble: { l: 996, t: 802, w: 100 },
+      }}
+      stats={{
+        km: { icon: "cactus", value: "42" },
+        temp: { icon: "arma", value: "32" },
+        goal: { icon: "cerezas" },
+      }}
+    >
+      <div className={v.content}>
+        <h1 className={`${v.gothic} ${v.mTitle}`}>Manuel Agudelo</h1>
+
+        <p className={`${v.copy} ${v.mCopy}`}>
+          <Lines lines={LOREM_3} />
+        </p>
+
+        <p className={v.quote}>“CALLATE Y CORRE”</p>
+
+        <div className={v.polaroid}>
+          <div className={v.polaroidPhoto}>
+            <Image src={PORTRAIT} alt="Manuel Agudelo" width={874} height={900} unoptimized />
           </div>
-        </div>
-
-        {/* Info Area */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
-          <h1 className="text-fluid-title" style={{ lineHeight: 1, marginBottom: '2rem' }}>
-            MANUEL<br/>AGUDELO
-          </h1>
-          
-          <h3 className="text-fluid-subtitle" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', marginBottom: '2rem', letterSpacing: '1px' }}>
-            CORREDOR. EDUCADOR. INSPIRACIÓN.
-          </h3>
-
-          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem', maxWidth: '400px' }}>
-            Tengo 40 años, soy Licenciado en Educación Física y llevo más de 23 años corriendo. Mi pasión es desafiar la distancia.
-          </p>
-
-          <button style={{
-            background: 'none', border: 'none', color: 'var(--accent-magenta)',
-            fontFamily: 'var(--font-mono)', fontSize: '0.9rem', cursor: 'pointer',
-            textAlign: 'left', marginBottom: '4rem'
-          }}>
-            CONOCE MI HISTORIA →
-          </button>
-
-          {/* Stats Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '2rem', rowGap: '3rem' }}>
-            
-            <div>
-              <div style={{ fontSize: '2.5rem', color: 'var(--accent-lime)', fontFamily: 'var(--font-display)', lineHeight: 1 }}>51.750</div>
-              <div className="font-mono" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>KM TOTALES</div>
-            </div>
-
-            <div>
-              <div style={{ fontSize: '2.5rem', color: 'var(--accent-lime)', fontFamily: 'var(--font-display)', lineHeight: 1 }}>224.563 M</div>
-              <div className="font-mono" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>DESNIVEL ACUMULADO</div>
-            </div>
-
-            <div>
-              <div style={{ fontSize: '2.5rem', color: 'var(--accent-lime)', fontFamily: 'var(--font-display)', lineHeight: 1 }}>310 KM</div>
-              <div className="font-mono" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>MÁXIMA DISTANCIA</div>
-            </div>
-
-            <div>
-              <div style={{ fontSize: '2.5rem', color: 'var(--accent-lime)', fontFamily: 'var(--font-display)', lineHeight: 1 }}>10</div>
-              <div className="font-mono" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>PAÍSES</div>
-            </div>
-
-            <div>
-              <div style={{ fontSize: '2.5rem', color: 'var(--accent-lime)', fontFamily: 'var(--font-display)', lineHeight: 1 }}>23+</div>
-              <div className="font-mono" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>AÑOS CORRIENDO</div>
-            </div>
-
-            <div>
-              <div style={{ fontSize: '1.5rem', color: 'var(--accent-lime)', fontFamily: 'var(--font-display)', lineHeight: 1.2 }}>ENTRENADOR</div>
-              <div className="font-mono" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>WORLD ATHLETICS NIVEL 1</div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      {/* Bottom Photos and Quote */}
-      <div style={{ display: 'flex', gap: '2rem', marginTop: '2rem', alignItems: 'center', paddingBottom: '4rem' }}>
-        <div style={{ display: 'flex', gap: '1rem', flex: 1 }}>
-          {[1,2,3,4].map((imgNum, idx) => {
-            const actualIndex = idx + 1;
-            return (
-              <div 
-                key={actualIndex} 
-                onClick={() => setActiveIndex(actualIndex)}
-                style={{ 
-                  flex: 1, 
-                  aspectRatio: '1', 
-                  background: `url("/${imgNum}.png") center/cover`, 
-                  filter: activeIndex === actualIndex ? 'grayscale(0%)' : 'grayscale(100%)',
-                  opacity: activeIndex === actualIndex ? 1 : 0.6,
-                  cursor: 'pointer',
-                  border: activeIndex === actualIndex ? '2px solid var(--accent-magenta)' : '2px solid transparent',
-                  transition: 'all 0.3s ease'
-                }} 
-              />
-            );
-          })}
-        </div>
-        
-        <div style={{ flex: 1, paddingLeft: '2rem' }}>
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '1.2rem', color: 'var(--text-primary)', fontStyle: 'italic', lineHeight: 1.5 }}>
-            <span style={{ color: 'var(--accent-lime)', fontSize: '2rem' }}>"</span>
-            Los límites siempre pueden moverse un poco más.
-            <span style={{ color: 'var(--accent-lime)', fontSize: '2rem' }}>"</span>
-          </p>
+          <Image
+            src="/scene/photos/marco.webp"
+            alt=""
+            width={900}
+            height={1060}
+            unoptimized
+            className={v.polaroidFrame}
+          />
+          <Image
+            src="/scene/photos/cinta.webp"
+            alt=""
+            width={700}
+            height={700}
+            unoptimized
+            className={v.polaroidTape}
+          />
+          <Link href="/road-to-500" className={v.storyBtn}>
+            <Icon name="flecha" className={v.arrow} />
+            <span className={`${v.yTag}`}>Conoce mi historia</span>
+          </Link>
         </div>
       </div>
-
-    </div>
+    </Scene>
   );
 }

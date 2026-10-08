@@ -7,8 +7,9 @@ import { Menu, X } from 'lucide-react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // El home trae su propia navegación (etiquetas amarillas), así que ocultamos el header global ahí.
-  const isHome = usePathname() === '/';
+  // Las vistas del rediseño traen su propia navegación (etiquetas amarillas): ocultamos el header global ahí.
+  const pathname = usePathname();
+  const isHome = ['/', '/dona', '/manu', '/marcas', '/road-to-500', '/reto'].includes(pathname);
 
   useEffect(() => {
     if (isMobileMenuOpen) {

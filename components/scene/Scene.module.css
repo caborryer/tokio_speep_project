@@ -1,0 +1,342 @@
+/* Fuentes: Amador (títulos góticos) y Futura (UI / textos). */
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@500;700&display=swap');
+
+@font-face {
+  font-family: 'Amador TSP';
+  src: url('/fonts/amador.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Futura TSP';
+  font-weight: 500;
+  src: url('/fonts/futura-medium.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Futura TSP';
+  font-weight: 700;
+  src: url('/fonts/futura-bold.woff2') format('woff2');
+  font-display: swap;
+}
+
+.scene {
+  --yellow: #ede864;
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  min-height: 100vh;
+  background: #050505;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end; /* el escenario se ancla abajo */
+  font-family: 'Futura TSP', 'Futura', 'Jost', 'Century Gothic', sans-serif;
+  color: #fff;
+}
+
+/* ---------- Capas de fondo ---------- */
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.bg > * {
+  position: absolute;
+  inset: 0;
+}
+.photo {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.shade {
+  background: rgba(5, 5, 5, 0.55);
+}
+.grid {
+  background: url('/scene/photos/cuadricula.webp') center / cover no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+.topo {
+  background: url('/scene/photos/topo.webp') center / cover no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.14;
+}
+.dots {
+  background: url('/scene/photos/puntos.webp') center / cover no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.2;
+}
+
+/* Inicio: negro + Santa Monica de noche asomando abajo */
+.bg_home .photo {
+  top: auto;
+  height: 46%;
+  background-image: url('/scene/photos/santa-monica.webp');
+  background-position: center 70%;
+  opacity: 0.38;
+  filter: grayscale(0.4) brightness(0.85);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 55%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 55%);
+}
+.bg_home .shade {
+  background: none;
+}
+
+.bg_dona .photo {
+  background-image: url('/scene/photos/dona.webp');
+  filter: grayscale(0.55) brightness(0.62) contrast(1.05);
+}
+.bg_manu .photo {
+  background-image: url('/scene/photos/manu.webp');
+  background-position: 38% center;
+  filter: grayscale(0.85) brightness(0.55) contrast(1.05);
+}
+.bg_manu .shade {
+  background: rgba(8, 8, 8, 0.38);
+}
+.bg_marcas .photo {
+  background-image: url('/scene/photos/marcas.webp');
+  background-position: center 62%;
+  filter: grayscale(0.85) brightness(0.52);
+}
+.bg_road .photo {
+  background-image: url('/scene/photos/road.webp');
+  filter: grayscale(0.85) brightness(0.55);
+}
+
+/* ---------- Escenario 1920 x 1080 (todo escala con --u) ---------- */
+.stage {
+  --u: calc(100cqw / 1920);
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.imgC {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+.line {
+  filter: invert(1);
+}
+
+/* Etiquetas amarillas (nav + botones) */
+.tag {
+  display: inline-block;
+  background: var(--yellow);
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  line-height: 1.05;
+  white-space: nowrap;
+  transition: transform 0.15s ease;
+}
+.tag:hover {
+  transform: rotate(0deg) scale(1.05) !important;
+}
+
+.nav {
+  position: absolute;
+  left: calc(var(--u) * 48);
+  top: calc(var(--u) * 72);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--u) * 15);
+  z-index: 5;
+}
+.nav .tag {
+  font-size: calc(var(--u) * 27);
+  padding: calc(var(--u) * 5) calc(var(--u) * 8);
+}
+.nav .tag:nth-child(1) { transform: rotate(-0.5deg); }
+.nav .tag:nth-child(2) { transform: rotate(0.4deg); }
+.nav .tag:nth-child(3) { transform: rotate(0.9deg); }
+.nav .tag:nth-child(4) { transform: rotate(1.8deg); margin-left: calc(var(--u) * 3); padding-right: calc(var(--u) * 22); }
+.nav .tag:nth-child(5) { transform: rotate(0.8deg); margin-left: calc(var(--u) * 4); }
+.nav .tag:nth-child(6) { transform: rotate(-0.6deg); margin-left: calc(var(--u) * 2); }
+
+.donate {
+  position: absolute;
+  right: calc(var(--u) * 70);
+  top: calc(var(--u) * 52);
+  font-size: calc(var(--u) * 30);
+  padding: calc(var(--u) * 14) calc(var(--u) * 20);
+  transform: rotate(-1deg);
+  z-index: 5;
+}
+
+/* ---------- Mapa del recorrido (1700 x 430, origen en 110, 635) ---------- */
+.map {
+  position: absolute;
+  left: calc(var(--u) * 110);
+  top: calc(var(--u) * 635);
+  width: calc(var(--u) * 1700);
+  height: calc(var(--u) * 430);
+}
+.map > * {
+  position: absolute;
+}
+.mRoute { left: calc(var(--u) * 290); top: calc(var(--u) * 87); width: calc(var(--u) * 1305); height: calc(var(--u) * 195); }
+.mSanta { left: calc(var(--u) * 10); top: calc(var(--u) * 135); width: calc(var(--u) * 268); height: calc(var(--u) * 118); }
+.mCity { left: calc(var(--u) * 635); top: calc(var(--u) * 258); width: calc(var(--u) * 238); height: calc(var(--u) * 73); }
+.mDeath { left: calc(var(--u) * 820); top: calc(var(--u) * 33); width: calc(var(--u) * 325); height: calc(var(--u) * 184); }
+.mVegas { left: calc(var(--u) * 1515); top: calc(var(--u) * 7); width: calc(var(--u) * 182); height: calc(var(--u) * 180); }
+.mStart { left: calc(var(--u) * 72); top: calc(var(--u) * 95); width: calc(var(--u) * 150); height: calc(var(--u) * 45); }
+
+/* Marcadores móviles: posición y ancho llegan por --l, --t, --w (unidades de diseño) */
+.mStar {
+  left: calc(var(--u) * var(--l));
+  top: calc(var(--u) * var(--t));
+  width: calc(var(--u) * 48);
+  height: calc(var(--u) * 46);
+}
+.mHead {
+  left: calc(var(--u) * var(--l));
+  top: calc(var(--u) * var(--t));
+  width: calc(var(--u) * var(--w));
+  aspect-ratio: 540 / 690;
+}
+.mBubble {
+  left: calc(var(--u) * var(--l));
+  top: calc(var(--u) * var(--t));
+  width: calc(var(--u) * var(--w));
+  aspect-ratio: 657 / 588;
+}
+.brand {
+  position: absolute;
+  inset: 0 0 18% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: 700;
+  font-size: calc(var(--u) * var(--w) * 0.25);
+  letter-spacing: -0.02em;
+}
+.brand .i {
+  position: relative;
+}
+.brand .i::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -0.08em;
+  width: 0.18em;
+  height: 0.18em;
+  margin-left: -0.09em;
+  border-radius: 50%;
+  background: #e30613;
+}
+
+/* ---------- Datos (km / temperatura / meta) ---------- */
+.stats {
+  position: absolute;
+  left: calc(var(--u) * 1250);
+  top: calc(var(--u) * 930);
+  width: calc(var(--u) * 640);
+  height: calc(var(--u) * 140);
+}
+.stats > * {
+  position: absolute;
+}
+.sIcon { top: calc(var(--u) * 20); height: calc(var(--u) * 100); }
+.sI1 { left: calc(var(--u) * 14); width: calc(var(--u) * 102); }
+.sI2 { left: calc(var(--u) * 208); width: calc(var(--u) * 84); }
+.sI3 { left: calc(var(--u) * 444); width: calc(var(--u) * 92); }
+.sTxt { font-weight: 700; line-height: 1.04; white-space: nowrap; }
+.big { font-size: 1.14em; }
+.sT1 { left: calc(var(--u) * 122); top: calc(var(--u) * 42); font-size: calc(var(--u) * 33); }
+.sT2 { left: calc(var(--u) * 296); top: calc(var(--u) * 50); font-size: calc(var(--u) * 33); }
+.sT2 small { display: block; font-size: calc(var(--u) * 21); margin-top: calc(var(--u) * 2); }
+.sT3 { left: calc(var(--u) * 542); top: calc(var(--u) * 40); font-size: calc(var(--u) * 27); }
+
+.mapWrap {
+  display: contents;
+}
+
+/* ---------- Móvil / tablet: composición apilada ---------- */
+@container (max-width: 899px) {
+  .stage {
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px 0 44px;
+    gap: 22px;
+  }
+
+  .nav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 16px;
+    padding-right: 150px; /* deja espacio al botón Dona ahora */
+  }
+  .nav .tag,
+  .nav .tag:nth-child(n) {
+    font-size: clamp(13px, 4vw, 17px);
+    padding: 4px 8px;
+    margin: 0;
+  }
+  .donate {
+    position: absolute;
+    right: 16px;
+    top: 18px;
+    font-size: clamp(13px, 4vw, 17px);
+    padding: 8px 12px;
+  }
+
+  .mapWrap {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+  }
+  .map {
+    position: relative;
+    left: 0;
+    top: 0;
+    --u: calc((100cqw - 24px) / 1700);
+    margin: 0 12px;
+    flex: none;
+  }
+
+  .stats {
+    position: relative;
+    left: 0;
+    top: 0;
+    --u: calc(min(100cqw, 600px) / 680);
+    margin: 0 auto;
+  }
+}
+
+/* ---------- Movimiento de los iconos al pasar el mouse ---------- */
+@keyframes iconHop {
+  0%   { transform: translateY(0) rotate(0) scale(1); }
+  25%  { transform: translateY(-14%) rotate(-9deg) scale(1.1, 0.96); }
+  50%  { transform: translateY(0) rotate(7deg) scale(0.97, 1.04); }
+  75%  { transform: translateY(-5%) rotate(-3deg) scale(1.04); }
+  100% { transform: translateY(0) rotate(0) scale(1); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .sIcon:hover > img,
+  .mHead:hover > img,
+  .mStart:hover > img,
+  .mBubble:hover > img,
+  .mStar:hover > img {
+    transform-origin: 50% 90%;
+    animation: iconHop 0.6s ease-in-out;
+  }
+}

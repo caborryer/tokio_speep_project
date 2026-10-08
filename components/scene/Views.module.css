@@ -1,0 +1,800 @@
+/*
+ * Contenido propio de cada vista, posicionado sobre el escenario de 1920 x 1080
+ * (--u = 1/1920 del ancho). En móvil/tablet (< 900px) todo pasa a una columna.
+ */
+
+.content {
+  display: contents;
+}
+
+.abs {
+  position: absolute;
+}
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.imgC {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Etiqueta amarilla */
+.yTag {
+  display: inline-block;
+  background: var(--yellow);
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+/* Títulos góticos */
+.gothic {
+  font-family: 'Amador TSP', 'UnifrakturCook', serif;
+  font-weight: 400;
+  line-height: 1;
+  margin: 0;
+  white-space: nowrap;
+  text-transform: none;
+}
+
+/* Texto de apoyo */
+.copy {
+  position: absolute;
+  margin: 0;
+  font-weight: 500;
+  font-size: calc(var(--u) * 28.5);
+  line-height: 1.18;
+}
+.copy span {
+  display: block;
+}
+
+/* =====================================================================
+   INICIO
+   ===================================================================== */
+.hTitleBox {
+  position: absolute;
+  --k: 0.62;
+  left: calc(var(--u) * 341);
+  top: calc(var(--u) * 72);
+  width: calc(var(--u) * 560);
+  height: calc(var(--u) * 270);
+}
+.hTitle {
+  position: absolute;
+  inset: 0;
+}
+.hTitle span {
+  position: absolute;
+  display: block;
+}
+.tEl { left: calc(var(--u) * var(--k) * 8); top: calc(var(--u) * var(--k) * 52); font-size: calc(var(--u) * var(--k) * 118); }
+.tReto { left: calc(var(--u) * var(--k) * 110); top: calc(var(--u) * var(--k) * -28); font-size: calc(var(--u) * var(--k) * 250); }
+.t500 { left: calc(var(--u) * var(--k) * 22); top: calc(var(--u) * var(--k) * 148); font-size: calc(var(--u) * var(--k) * 215); }
+.tKm { left: calc(var(--u) * var(--k) * 312); top: calc(var(--u) * var(--k) * 164); font-size: calc(var(--u) * var(--k) * 126); }
+.speed {
+  position: absolute;
+  left: calc(var(--u) * 326);
+  top: calc(var(--u) * 156);
+  font-size: calc(var(--u) * 25);
+  font-style: italic;
+  padding: calc(var(--u) * 15) calc(var(--u) * 12) calc(var(--u) * 12);
+  transform: rotate(-5.8deg);
+  text-transform: none;
+}
+.hCopy {
+  left: calc(var(--u) * 288);
+  top: calc(var(--u) * 331);
+  width: calc(var(--u) * 660);
+}
+
+.video {
+  position: absolute;
+  left: calc(var(--u) * 1016);
+  top: calc(var(--u) * 158);
+  width: calc(var(--u) * 768);
+  height: calc(var(--u) * 442);
+  background: var(--yellow);
+  box-shadow: 0 calc(var(--u) * 10) calc(var(--u) * 30) rgba(0, 0, 0, 0.35);
+}
+.video iframe,
+.video video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+.playBtn {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.playBtn:disabled {
+  cursor: default;
+}
+.playIcon {
+  width: calc(var(--u) * 100);
+  height: calc(var(--u) * 100);
+  transition: transform 0.15s ease;
+}
+.playBtn:not(:disabled):hover .playIcon {
+  transform: scale(1.08);
+}
+.tape1 {
+  position: absolute;
+  left: calc(var(--u) * 925);
+  top: calc(var(--u) * 53);
+  width: calc(var(--u) * 290);
+  height: calc(var(--u) * 290);
+  transform: rotate(-14deg);
+  pointer-events: none;
+}
+.tape2 {
+  position: absolute;
+  left: calc(var(--u) * 1612);
+  top: calc(var(--u) * 435);
+  width: calc(var(--u) * 245);
+  height: calc(var(--u) * 245);
+  transform: rotate(-8deg);
+  pointer-events: none;
+}
+
+/* =====================================================================
+   DONA UN KM
+   ===================================================================== */
+.dTitle {
+  position: absolute;
+  left: calc(var(--u) * 372);
+  top: calc(var(--u) * 82);
+}
+.dTitle span {
+  display: block;
+}
+.dT1 { font-size: calc(var(--u) * 150); }
+.dT2 { font-size: calc(var(--u) * 98); margin-top: calc(var(--u) * -24); }
+.dCopy {
+  left: calc(var(--u) * 384);
+  top: calc(var(--u) * 331);
+  width: calc(var(--u) * 640);
+}
+.dHead {
+  position: absolute;
+  left: calc(var(--u) * 144);
+  top: calc(var(--u) * 432);
+  width: calc(var(--u) * 140);
+}
+.bar {
+  position: absolute;
+  left: calc(var(--u) * 300);
+  top: calc(var(--u) * 502);
+  width: calc(var(--u) * 927);
+  height: calc(var(--u) * 64);
+  border: calc(var(--u) * 6) solid #fff;
+  padding: calc(var(--u) * 7) calc(var(--u) * 8);
+  box-sizing: border-box;
+}
+.barFill {
+  height: 100%;
+  width: var(--p, 50%);
+  background: var(--yellow);
+}
+.barText {
+  position: absolute;
+  left: calc(var(--u) * 700);
+  width: calc(var(--u) * 521);
+  top: calc(var(--u) * 584);
+  text-align: right;
+  color: var(--yellow);
+  font-weight: 700;
+  font-size: calc(var(--u) * 36);
+  white-space: nowrap;
+}
+.coins {
+  position: absolute;
+  left: calc(var(--u) * 1300);
+  top: calc(var(--u) * 188);
+  width: calc(var(--u) * 560);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.coin {
+  position: absolute;
+  left: 0;
+  top: calc(var(--u) * var(--y));
+  display: flex;
+  align-items: center;
+  height: calc(var(--u) * 76);
+  margin-top: calc(var(--u) * -38);
+}
+.coinImg {
+  width: calc(var(--u) * 66);
+  height: calc(var(--u) * 73);
+  margin-right: calc(var(--u) * 22);
+  flex: none;
+}
+.price {
+  font-size: calc(var(--u) * 39);
+  padding: calc(var(--u) * 6) calc(var(--u) * 22);
+  transform: rotate(-1deg);
+  flex: none;
+}
+.coinKm {
+  margin-left: calc(var(--u) * 26);
+  font-weight: 700;
+  font-size: calc(var(--u) * 36);
+  white-space: nowrap;
+}
+
+/* =====================================================================
+   MANU
+   ===================================================================== */
+.mTitle {
+  position: absolute;
+  left: calc(var(--u) * 278);
+  top: calc(var(--u) * 212);
+  font-size: calc(var(--u) * 124);
+}
+.mCopy {
+  left: calc(var(--u) * 281);
+  top: calc(var(--u) * 379);
+  width: calc(var(--u) * 760);
+  font-size: calc(var(--u) * 33);
+  line-height: 1.27;
+}
+.quote {
+  position: absolute;
+  left: calc(var(--u) * 221);
+  top: calc(var(--u) * 520);
+  margin: 0;
+  color: var(--yellow);
+  font-weight: 700;
+  font-style: italic;
+  font-size: calc(var(--u) * 78);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transform: rotate(-2.2deg);
+  transform-origin: left center;
+}
+.polaroid {
+  position: absolute;
+  left: calc(var(--u) * 1161);
+  top: calc(var(--u) * 147);
+  width: calc(var(--u) * 500);
+  aspect-ratio: 900 / 1060;
+  transform: rotate(4.5deg);
+  filter: drop-shadow(0 calc(var(--u) * 14) calc(var(--u) * 24) rgba(0, 0, 0, 0.45));
+}
+.polaroidPhoto {
+  position: absolute;
+  left: 12.7%;
+  top: 13.2%;
+  width: 74.8%;
+  height: 61.5%;
+  overflow: hidden;
+  background: #111;
+}
+.polaroidPhoto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.polaroidFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.polaroidTape {
+  position: absolute;
+  left: 33%;
+  top: -14%;
+  width: 34%;
+  height: auto;
+  transform: rotate(-6deg);
+  pointer-events: none;
+  z-index: 2;
+}
+.storyBtn {
+  position: absolute;
+  left: 7%;
+  top: 80.5%;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  z-index: 3;
+}
+.storyBtn .arrow {
+  width: calc(var(--u) * 82);
+  height: calc(var(--u) * 75);
+  margin-right: calc(var(--u) * -6);
+  position: relative;
+  z-index: 1;
+}
+.storyBtn .yTag {
+  font-size: calc(var(--u) * 27);
+  padding: calc(var(--u) * 14) calc(var(--u) * 16);
+}
+
+/* =====================================================================
+   MARCAS
+   ===================================================================== */
+.kTitle {
+  position: absolute;
+  left: calc(var(--u) * 293);
+  top: calc(var(--u) * 212);
+  font-size: calc(var(--u) * 124);
+}
+.kCopy {
+  left: calc(var(--u) * 296);
+  top: calc(var(--u) * 365);
+  width: calc(var(--u) * 640);
+}
+.benefit {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  left: calc(var(--u) * var(--l));
+  top: calc(var(--u) * var(--t));
+  transform: translateY(-50%);
+  gap: calc(var(--u) * 14);
+}
+.benefit .bi {
+  width: calc(var(--u) * var(--w));
+  flex: none;
+}
+.benefit span {
+  font-weight: 700;
+  font-size: calc(var(--u) * 21);
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+/* Camioneta: coordenadas locales en píxeles del diseño original (1110 x 605) */
+.truck {
+  --k: calc(var(--u) * 0.96);
+  position: absolute;
+  left: calc(var(--u) * 749);
+  top: calc(var(--u) * 38);
+  width: calc(var(--k) * 1110);
+  height: calc(var(--k) * 583);
+}
+.truck > * {
+  position: absolute;
+}
+.truckImg {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.tm {
+  left: calc(var(--k) * var(--x));
+  top: calc(var(--k) * var(--y));
+  width: calc(var(--k) * var(--w));
+  height: calc(var(--k) * var(--h));
+  transform: rotate(calc(var(--r, 0) * 1deg));
+  display: grid;
+  place-items: center;
+  text-align: center;
+  background: var(--yellow);
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.05;
+  font-size: calc(var(--k) * var(--f, 17));
+}
+.tmWin {
+  background: none;
+  color: #fff;
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+.tmLamp {
+  border-radius: calc(var(--k) * 6);
+}
+.joinBtn {
+  position: absolute;
+  left: calc(var(--u) * 1211);
+  top: calc(var(--u) * 645);
+  font-size: calc(var(--u) * 31);
+  padding: calc(var(--u) * 14) calc(var(--u) * 14);
+  transform: rotate(-1deg);
+  text-decoration: none;
+}
+
+/* =====================================================================
+   ROAD TO 500
+   ===================================================================== */
+.rTitle {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: calc(var(--u) * 52);
+  text-align: center;
+  font-size: calc(var(--u) * 176);
+}
+.rCopy {
+  left: calc(var(--u) * 640);
+  top: calc(var(--u) * 252);
+  width: calc(var(--u) * 640);
+  text-align: center;
+}
+.rRoute {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.rRoute path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 7.5;
+  stroke-dasharray: 24 15;
+  stroke-linejoin: round;
+}
+.ms {
+  display: contents;
+}
+.msNum,
+.msStar,
+.msIcon,
+.msText {
+  position: absolute;
+  left: calc(var(--u) * var(--l));
+  top: calc(var(--u) * var(--t));
+}
+.msNum {
+  width: calc(var(--u) * var(--w));
+  height: calc(var(--u) * var(--w));
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: calc(var(--u) * var(--w) * 0.62);
+  line-height: 1;
+}
+.msStar,
+.msIcon {
+  width: calc(var(--u) * var(--w));
+}
+.msText {
+  width: calc(var(--u) * var(--w));
+}
+.msText h3 {
+  margin: 0 0 calc(var(--u) * 6);
+  font-size: calc(var(--u) * 39);
+  font-weight: 700;
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+.msText p {
+  margin: 0;
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  line-height: 1.15;
+}
+.msBig h3 {
+  font-size: calc(var(--u) * 41);
+}
+
+/* =====================================================================
+   Móvil / tablet
+   ===================================================================== */
+@container (max-width: 899px) {
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 22px;
+    --m: 20px;
+  }
+  .abs,
+  .copy,
+  .dTitle,
+  .dHead,
+  .bar,
+  .barText,
+  .coins,
+  .mTitle,
+  .quote,
+  .polaroid,
+  .kTitle,
+  .benefit,
+  .truck,
+  .joinBtn,
+  .rTitle,
+  .video,
+  .tape1,
+  .tape2 {
+    position: static;
+  }
+  .copy {
+    width: auto;
+    padding: 0 var(--m);
+    font-size: clamp(15px, 4.2vw, 19px);
+    line-height: 1.4;
+  }
+  .copy span {
+    display: inline;
+  }
+
+  /* ---- Inicio ---- */
+  .hTitleBox {
+    position: relative;
+    --u: calc(100cqw / 640);
+    left: auto;
+    top: auto;
+    width: calc(var(--u) * 560);
+    height: calc(var(--u) * 270);
+    margin: 4px auto 0;
+  }
+  .video {
+    --u: calc(100cqw / 1000);
+    margin: 18px auto 6px;
+    width: min(calc(100% - 32px), 640px);
+    left: auto;
+    top: auto;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    position: relative;
+  }
+  .tape1,
+  .tape2 {
+    position: absolute;
+  }
+  .tape1 {
+    left: -14%;
+    top: -20%;
+    width: 38%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .tape2 {
+    left: auto;
+    right: -10%;
+    top: auto;
+    bottom: -22%;
+    width: 32%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .playIcon {
+    width: 13%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  /* ---- Dona un km ---- */
+  .dTitle {
+    padding: 0 var(--m);
+    text-align: left;
+  }
+  .dT1 { font-size: clamp(54px, 17vw, 96px); }
+  .dT2 { font-size: clamp(34px, 11vw, 62px); margin-top: -0.2em; }
+  .dHead {
+    width: 64px;
+    flex: none;
+  }
+  .progress {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 var(--m);
+  }
+  .progressRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .bar {
+    --u: calc(100cqw / 1000);
+    flex: 1;
+    width: auto;
+    height: 44px;
+    border-width: 4px;
+    padding: 5px 6px;
+  }
+  .barText {
+    width: auto;
+    text-align: right;
+    font-size: clamp(15px, 4.4vw, 20px);
+  }
+  .coins {
+    padding: 0 var(--m);
+    width: auto;
+    display: grid;
+    gap: 14px;
+  }
+  .coin {
+    position: static;
+    margin: 0;
+    height: auto;
+    --u: calc(100cqw / 700);
+  }
+  .coinImg {
+    width: 40px;
+    height: 44px;
+    margin-right: 12px;
+  }
+  .price {
+    font-size: 24px;
+    padding: 4px 14px;
+  }
+  .coinKm {
+    font-size: 22px;
+    margin-left: 14px;
+  }
+
+  /* ---- Manu ---- */
+  .mTitle,
+  .kTitle,
+  .rTitle {
+    padding: 0 var(--m);
+    font-size: clamp(44px, 14.5vw, 92px);
+    text-align: left;
+  }
+  .rTitle {
+    text-align: center;
+  }
+  .mCopy {
+    font-size: clamp(15px, 4.4vw, 20px);
+  }
+  .quote {
+    padding: 0 var(--m);
+    font-size: clamp(28px, 9vw, 52px);
+    white-space: normal;
+    transform: rotate(-2deg);
+  }
+  .polaroid {
+    --u: calc(100cqw / 1000);
+    position: relative;
+    left: auto;
+    top: auto;
+    width: min(76%, 380px);
+    margin: 14px auto 40px;
+  }
+  .storyBtn .arrow {
+    width: 11cqw;
+    height: auto;
+    aspect-ratio: 724 / 664;
+  }
+  .storyBtn .yTag {
+    font-size: clamp(13px, 4.1vw, 19px);
+    padding: 9px 10px;
+  }
+
+  /* ---- Marcas ---- */
+  .benefits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 10px;
+    padding: 0 var(--m);
+  }
+  .benefit {
+    position: static;
+    transform: none;
+    gap: 10px;
+  }
+  .benefit .bi {
+    width: 46px;
+  }
+  .benefit span {
+    font-size: clamp(11px, 3.3vw, 14px);
+  }
+  .truck {
+    --k: calc((100cqw - 24px) / 1130);
+    position: relative;
+    left: auto;
+    top: auto;
+    margin: 6px auto 0;
+  }
+  .truck > * {
+    position: absolute;
+  }
+  .joinBtn {
+    align-self: center;
+    font-size: clamp(16px, 5vw, 22px);
+    padding: 10px 14px;
+    --u: calc(100cqw / 1000);
+  }
+
+  /* ---- Road to 500 ---- */
+  .rCopy {
+    text-align: center;
+  }
+  .rRoute {
+    display: none;
+  }
+  .roadList {
+    display: grid;
+    gap: 22px;
+    padding: 0 var(--m);
+  }
+  .ms {
+    display: grid;
+    grid-template-columns: 44px 70px 1fr;
+    column-gap: 12px;
+    align-items: center;
+  }
+  .msNum,
+  .msStar,
+  .msIcon,
+  .msText {
+    position: static;
+    width: auto;
+  }
+  .msNum {
+    width: 44px;
+    height: 44px;
+    font-size: 26px;
+  }
+  .msStar {
+    display: none;
+  }
+  .msIcon {
+    width: 70px;
+  }
+  .msText {
+    width: auto;
+  }
+  .msText h3,
+  .msBig h3 {
+    font-size: clamp(19px, 5.4vw, 26px);
+  }
+  .msText p {
+    font-size: clamp(12.5px, 3.6vw, 15px);
+    line-height: 1.35;
+  }
+  .msHead {
+    display: none;
+  }
+}
+
+@container (min-width: 900px) {
+  .progress,
+  .progressRow,
+  .benefits,
+  .roadList {
+    display: contents;
+  }
+}
+
+/* ---------- Movimiento de los iconos al pasar el mouse ---------- */
+@keyframes iconHop {
+  0%   { transform: translateY(0) rotate(0) scale(1); }
+  25%  { transform: translateY(-14%) rotate(-9deg) scale(1.1, 0.96); }
+  50%  { transform: translateY(0) rotate(7deg) scale(0.97, 1.04); }
+  75%  { transform: translateY(-5%) rotate(-3deg) scale(1.04); }
+  100% { transform: translateY(0) rotate(0) scale(1); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .coinImg:hover,
+  .dHead:hover > img,
+  .bi:hover img,
+  .msIcon:hover img,
+  .playBtn:hover .playIcon,
+  .storyBtn:hover .arrow {
+    transform-origin: 50% 90%;
+    animation: iconHop 0.6s ease-in-out;
+  }
+}

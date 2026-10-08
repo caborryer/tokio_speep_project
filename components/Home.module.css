@@ -113,17 +113,19 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: calc(var(--u) * 19);
+  gap: calc(var(--u) * 15);
   z-index: 5;
 }
 .nav .tag {
-  font-size: calc(var(--u) * 31);
+  font-size: calc(var(--u) * 27);
   padding: calc(var(--u) * 5) calc(var(--u) * 8);
 }
-.nav .tag:nth-child(1) { transform: rotate(0.4deg); }
-.nav .tag:nth-child(2) { transform: rotate(0.9deg); }
-.nav .tag:nth-child(3) { transform: rotate(1.8deg); margin-left: calc(var(--u) * 3); padding-right: calc(var(--u) * 22); }
-.nav .tag:nth-child(4) { transform: rotate(0.8deg); margin-left: calc(var(--u) * 4); }
+.nav .tag:nth-child(1) { transform: rotate(-0.5deg); }
+.nav .tag:nth-child(2) { transform: rotate(0.4deg); }
+.nav .tag:nth-child(3) { transform: rotate(0.9deg); }
+.nav .tag:nth-child(4) { transform: rotate(1.8deg); margin-left: calc(var(--u) * 3); padding-right: calc(var(--u) * 22); }
+.nav .tag:nth-child(5) { transform: rotate(0.8deg); margin-left: calc(var(--u) * 4); }
+.nav .tag:nth-child(6) { transform: rotate(-0.6deg); margin-left: calc(var(--u) * 2); }
 
 .donate {
   position: absolute;
@@ -218,8 +220,9 @@
   top: calc(var(--u) * 20);
   width: calc(var(--u) * 206);
   height: calc(var(--u) * 150);
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #000;
   font-weight: 700;
   font-size: calc(var(--u) * 50);
@@ -239,6 +242,9 @@
   border-radius: 50%;
   background: #e30613;
 }
+
+.mHead { left: calc(var(--u) * 75); top: calc(var(--u) * -63); width: calc(var(--u) * 146); height: calc(var(--u) * 175); }
+.mStart { left: calc(var(--u) * 78); top: calc(var(--u) * 275); width: calc(var(--u) * 148); height: calc(var(--u) * 45); }
 
 /* ---------- Datos ---------- */
 .stats {
@@ -356,19 +362,14 @@
   .mapWrap {
     display: block;
     width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .mapWrap::-webkit-scrollbar {
-    display: none;
+    overflow: hidden;
+    padding-top: calc((100cqw - 24px) / 1700 * 70);
   }
   .map {
     position: relative;
     left: 0;
     top: 0;
-    --u: calc(100cqw / 1000);
+    --u: calc((100cqw - 24px) / 1700);
     margin: 0 12px;
     flex: none;
   }
@@ -377,7 +378,7 @@
     position: relative;
     left: 0;
     top: 0;
-    --u: calc(100cqw / 680);
+    --u: calc(min(100cqw, 600px) / 680);
     margin: 0 auto;
   }
 }
@@ -385,5 +386,26 @@
 @container (min-width: 900px) {
   .copy span {
     display: block;
+  }
+}
+
+/* ---------- Movimiento de los iconos al pasar el mouse ---------- */
+@keyframes iconHop {
+  0%   { transform: translateY(0) rotate(0) scale(1); }
+  25%  { transform: translateY(-14%) rotate(-9deg) scale(1.1, 0.96); }
+  50%  { transform: translateY(0) rotate(7deg) scale(0.97, 1.04); }
+  75%  { transform: translateY(-5%) rotate(-3deg) scale(1.04); }
+  100% { transform: translateY(0) rotate(0) scale(1); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .sBrujula:hover img,
+  .sEnc:hover img,
+  .sFicha:hover img,
+  .mHead:hover img,
+  .mStart:hover img,
+  .mBubble:hover img,
+  .mStar:hover img {
+    transform-origin: 50% 90%;
+    animation: iconHop 0.6s ease-in-out;
   }
 }

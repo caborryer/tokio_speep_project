@@ -1,76 +1,114 @@
-"use client";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Icon from "@/components/scene/Icon";
+import { Lines, LOREM_3, LOREM_SHORT } from "@/components/scene/Lorem";
+import Scene from "@/components/scene/Scene";
+import v from "@/components/scene/Views.module.css";
+import type { IconName } from "@/lib/sceneIcons";
 
-import React from 'react';
+export const metadata: Metadata = {
+  title: "Road to 500 | El Reto 500 Kilómetros",
+  description: "El camino de Manuel hacia los 500 kilómetros: el sueño, el camino, la comunidad, la preparación final y la meta.",
+};
 
-export default function RoadPage() {
-  const timeline = [
-    { num: '01', title: 'THE DREAM', desc: 'Lanzamiento de la campaña.' },
-    { num: '02', title: 'THE BUILD', desc: 'Carreras, entrenamientos y activaciones con la comunidad.' },
-    { num: '03', title: 'THE COMMUNITY', desc: 'Retos y apadrinamiento de kilómetros.' },
-    { num: '04', title: 'THE FINAL PREP', desc: 'Cuenta regresiva y envío a USA.' },
-    { num: '05', title: 'THE SPEED PROJECT', desc: '500 km. Game on.' },
-  ];
+type Point = { l: number; t: number; w: number };
+type Milestone = {
+  n: number;
+  title: string;
+  text: string;
+  big?: boolean;
+  num: Point;
+  star: Point;
+  icon: { name: IconName; pos: Point };
+  copy: Point;
+};
 
+const STEPS: Milestone[] = [
+  {
+    n: 1, title: "El sueño", text: LOREM_SHORT,
+    num: { l: 110, t: 676, w: 68 }, star: { l: 161, t: 722, w: 84 },
+    icon: { name: "flags", pos: { l: 259, t: 667, w: 168 } },
+    copy: { l: 259, t: 760, w: 330 },
+  },
+  {
+    n: 2, title: "El camino", text: LOREM_SHORT,
+    num: { l: 631, t: 577, w: 70 }, star: { l: 686, t: 622, w: 86 },
+    icon: { name: "senal", pos: { l: 710, t: 526, w: 100 } },
+    copy: { l: 823, t: 528, w: 320 },
+  },
+  {
+    n: 3, title: "La comunidad", text: LOREM_SHORT,
+    num: { l: 1010, t: 741, w: 88 }, star: { l: 1071, t: 668, w: 88 },
+    icon: { name: "mundo", pos: { l: 1176, t: 662, w: 86 } },
+    copy: { l: 1118, t: 770, w: 330 },
+  },
+  {
+    n: 4, title: "Preparación final", text: LOREM_SHORT,
+    num: { l: 1370, t: 624, w: 88 }, star: { l: 1354, t: 538, w: 92 },
+    icon: { name: "botella", pos: { l: 1459, t: 514, w: 86 } },
+    copy: { l: 1474, t: 622, w: 330 },
+  },
+  {
+    n: 5, title: "The Speed Proyect", text: LOREM_SHORT, big: true,
+    num: { l: 1656, t: 360, w: 98 }, star: { l: 1669, t: 460, w: 88 },
+    icon: { name: "maquina", pos: { l: 1752, t: 440, w: 94 } },
+    copy: { l: 1493, t: 202, w: 330 },
+  },
+];
+
+/** Ruta punteada del recorrido (coordenadas del escenario 1920 x 1080). */
+const ROUTE =
+  "M213 744 L213 626 L259 607 L389 614 L422 634 L446 660 L499 655 L557 682 L603 714 L672 696 L730 662 L782 656 " +
+  "L835 682 L850 706 L960 712 L1075 720 L1118 715 L1186 672 L1212 629 L1277 624 L1354 619 L1392 586 L1411 566 " +
+  "L1450 566 L1555 605 L1632 581 L1699 533";
+
+const sty = (p: Point) => ({ "--l": p.l, "--t": p.t, "--w": p.w }) as React.CSSProperties;
+
+export default function RoadTo500Page() {
   return (
-    <div className="container" style={{ display: 'flex', flexDirection: 'column', paddingTop: '150px', alignItems: 'center' }}>
-      
-      <div style={{ maxWidth: '600px', width: '100%', position: 'relative' }}>
-        
-        <h1 className="text-fluid-title" style={{ lineHeight: 1.1, marginBottom: '2rem' }}>
-          ROAD TO 500
-        </h1>
-        
-        <p className="font-mono" style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '4rem', lineHeight: 1.6 }}>
-          UN CAMINO QUE EMPIEZA EN COLOMBIA<br/>
-          Y TERMINA EN LAS VEGAS.
+    <Scene
+      bg="road"
+      map={null}
+      stats={{
+        km: { icon: "lasvegas", value: "500" },
+        temp: { icon: "luna", value: "25" },
+        goal: { icon: "dado" },
+      }}
+    >
+      <div className={v.content}>
+        <h1 className={`${v.gothic} ${v.rTitle}`}>Road to 500</h1>
+
+        <p className={`${v.copy} ${v.rCopy}`}>
+          <Lines lines={LOREM_3} />
         </p>
 
-        {/* Timeline */}
-        <div style={{ position: 'relative', paddingLeft: '3rem', marginBottom: '4rem' }}>
-          {/* Vertical Line */}
-          <div style={{ position: 'absolute', left: '10px', top: '10px', bottom: '20px', width: '2px', backgroundColor: 'var(--accent-lime)' }} />
+        <svg className={v.rRoute} viewBox="0 0 1920 1080" preserveAspectRatio="none" aria-hidden="true">
+          <path d={ROUTE} />
+        </svg>
 
-          {timeline.map((item, idx) => (
-            <div key={idx} style={{ position: 'relative', marginBottom: '3rem' }}>
-              {/* Node */}
-              <div style={{ position: 'absolute', left: '-3rem', top: '5px', width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--accent-lime)', backgroundColor: 'var(--bg-primary)' }} />
-              
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <div className="font-mono" style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>{item.num}</div>
-                <div>
-                  <div className="font-mono" style={{ color: 'var(--text-primary)', fontSize: '1.2rem', marginBottom: '0.5rem' }}>{item.title}</div>
-                  <div className="font-mono" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{item.desc}</div>
-                </div>
+        <div className={v.roadList}>
+          {STEPS.map((s) => (
+            <div key={s.n} className={v.ms}>
+              <span className={v.msNum} style={sty(s.num)}>{s.n}</span>
+              <span className={v.msStar} style={sty(s.star)}>
+                <Image src="/home/estrella-mapa.svg" alt="" width={347} height={331} unoptimized className={v.img} />
+              </span>
+              <span className={v.msIcon} style={sty(s.icon.pos)}>
+                <Icon name={s.icon.name} className={v.img} />
+              </span>
+              <div className={`${v.msText} ${s.big ? v.msBig : ""}`} style={sty(s.copy)}>
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Pixel Art Section */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '2rem', paddingBottom: '4rem' }}>
-          <div style={{ position: 'relative', width: '100px', height: '100px' }}>
-             {/* Decorative pixel art proxy */}
-             <div style={{ width: '100%', height: '100%', backgroundColor: 'transparent', border: '4px dashed var(--accent-lime)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-               <div style={{ width: '64px', height: '64px', backgroundColor: 'var(--accent-lime)', maskImage: 'url("/running-ninja.svg")', WebkitMaskImage: 'url("/running-ninja.svg")', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center' }} />
-             </div>
-          </div>
-          
-          <div style={{ 
-            padding: '1.5rem', 
-            border: '2px solid white', 
-            borderRadius: '10px',
-            fontFamily: 'var(--font-mono)',
-            position: 'relative',
-            fontSize: '1rem',
-            lineHeight: 1.4,
-            maxWidth: '250px'
-          }}>
-            IT'S<br/>A LONG WAY<br/>BUT WE GO<br/>TOGETHER
-            <div style={{ position: 'absolute', left: '-10px', bottom: '20px', width: '10px', height: '10px', backgroundColor: 'var(--bg-primary)', borderBottom: '2px solid white', borderLeft: '2px solid white', transform: 'rotate(45deg)' }} />
-          </div>
-        </div>
-
+        {/* Manuel, cerca de la meta */}
+        <span className={`${v.msIcon} ${v.msHead}`} style={sty({ l: 1574, t: 490, w: 100 })} aria-hidden="true">
+          <Icon name="manu-pixel" className={v.img} />
+        </span>
       </div>
-    </div>
+    </Scene>
   );
 }
