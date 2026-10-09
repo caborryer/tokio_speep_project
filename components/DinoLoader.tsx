@@ -126,12 +126,19 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
     const bump = () => {
       loadedAssets += 1;
     };
-    assets.forEach((src) => {
-      const img = new Image();
-      img.onload = bump;
-      img.onerror = bump; // un asset roto no debe trabar el loader
-      img.src = src;
-    });
+    // Las imágenes de la página se piden DESPUÉS de que el juego arranca (o a los 4 s como máximo),
+    // para que sus propios archivos (sprites, KAPLAY) no compitan por el ancho de banda.
+    let preloading = false;
+    const startPreload = () => {
+      if (preloading) return;
+      preloading = true;
+      assets.forEach((src) => {
+        const img = new Image();
+        img.onload = bump;
+        img.onerror = bump; // un asset roto no debe trabar el loader
+        img.src = src;
+      });
+    };
 
     document.fonts?.ready.then(() => (fontsReady = true)).catch(() => (fontsReady = true));
     if (!document.fonts) fontsReady = true;
@@ -151,6 +158,7 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
 
     const tick = () => {
       const now = performance.now();
+      if (!preloading && (gameStartRef.current !== null || now - start > 4000)) startPreload();
       // El tiempo mínimo cuenta desde que el juego arranca, para que siempre alcancen a jugar.
       // Si el juego no logra iniciar en 6 s, se usa el reloj de la página como respaldo.
       const playStart = gameStartRef.current ?? (now - start > 6000 ? start : now);
