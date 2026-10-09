@@ -47,7 +47,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <nav className="app-nav hidden-mobile">
           <Link href="/reto" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>EL RETO</Link>
           <Link href="/manu" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>MANU</Link>
-          <Link href="/dona" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>DONA UN KM</Link>
+          <Link href="/dona" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>COMPRA UN KM</Link>
           <Link href="/marcas" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>MARCAS</Link>
           <Link href="/road-to-500" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>ROAD TO 500</Link>
           <Link href="/comunidad" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>COMUNIDAD</Link>
@@ -81,7 +81,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }}>
           <Link href="/reto" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '1.5rem', letterSpacing: '1px', textAlign: 'center' }}>EL RETO</Link>
           <Link href="/manu" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '1.5rem', letterSpacing: '1px', textAlign: 'center' }}>MANU</Link>
-          <Link href="/dona" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '1.5rem', letterSpacing: '1px', textAlign: 'center' }}>DONA UN KM</Link>
+          <Link href="/dona" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '1.5rem', letterSpacing: '1px', textAlign: 'center' }}>COMPRA UN KM</Link>
           <Link href="/marcas" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '1.5rem', letterSpacing: '1px', textAlign: 'center' }}>MARCAS</Link>
           <Link href="/road-to-500" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '1.5rem', letterSpacing: '1px', textAlign: 'center' }}>ROAD TO 500</Link>
           <Link href="/comunidad" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '1.5rem', letterSpacing: '1px', textAlign: 'center' }}>COMUNIDAD</Link>

@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Icon from "@/components/scene/Icon";
-import { Lines, LOREM_3, LOREM_SHORT } from "@/components/scene/Lorem";
+import { Lines, LOREM_SHORT } from "@/components/scene/Lorem";
 import Scene from "@/components/scene/Scene";
 import v from "@/components/scene/Views.module.css";
 import type { IconName } from "@/lib/sceneIcons";
+
+const ROAD_COPY = [
+  "Un camino que empieza en Colombia y termina en Las Vegas.",
+];
 
 export const metadata: Metadata = {
   title: "Road to 500 | El Reto 500 Kilómetros",
@@ -25,25 +29,25 @@ type Milestone = {
 
 const STEPS: Milestone[] = [
   {
-    n: 1, title: "El sueño", text: LOREM_SHORT,
+    n: 1, title: "El sueño", text: "Lanzamiento de la campaña.",
     num: { l: 110, t: 676, w: 68 }, star: { l: 161, t: 722, w: 84 },
     icon: { name: "flags", pos: { l: 259, t: 667, w: 168 } },
     copy: { l: 259, t: 760, w: 330 },
   },
   {
-    n: 2, title: "El camino", text: LOREM_SHORT,
+    n: 2, title: "El camino", text: "Carreras, entrenamientos y activaciones con la comunidad.",
     num: { l: 631, t: 577, w: 70 }, star: { l: 686, t: 622, w: 86 },
     icon: { name: "senal", pos: { l: 710, t: 526, w: 100 } },
     copy: { l: 823, t: 528, w: 320 },
   },
   {
-    n: 3, title: "La comunidad", text: LOREM_SHORT,
+    n: 3, title: "La comunidad", text: "Retos y apadrinamiento de kilómetros.",
     num: { l: 1010, t: 741, w: 88 }, star: { l: 1071, t: 668, w: 88 },
     icon: { name: "mundo", pos: { l: 1176, t: 662, w: 86 } },
     copy: { l: 1118, t: 770, w: 330 },
   },
   {
-    n: 4, title: "Preparación final", text: LOREM_SHORT,
+    n: 4, title: "Preparación final", text: "Cuenta regresiva y llegada a USA.",
     num: { l: 1370, t: 624, w: 88 }, star: { l: 1354, t: 538, w: 92 },
     icon: { name: "botella", pos: { l: 1459, t: 514, w: 86 } },
     copy: { l: 1474, t: 622, w: 330 },
@@ -79,7 +83,7 @@ export default function RoadTo500Page() {
         <h1 className={`${v.gothic} ${v.rTitle}`}>Road to 500</h1>
 
         <p className={`${v.copy} ${v.rCopy}`}>
-          <Lines lines={LOREM_3} />
+          <Lines lines={ROAD_COPY} />
         </p>
 
         <svg className={v.rRoute} viewBox="0 0 1920 1080" preserveAspectRatio="none" aria-hidden="true">

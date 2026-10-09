@@ -30,10 +30,8 @@ const HOME_ASSETS = [
 ];
 
 const COPY = [
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-  "sed do  eiusmod tempor incididunt ut labore et dolore",
-  "magna aliqua. Quis ipsum suspendisse ultrices gravida.",
-  "Risus commodo viverra maecenas accumsan lacus.",
+  "Primer colombiano en completar",
+  "THE SPEED PROJECT.",
 ];
 
 function Pic({ src, w, h, className = "", priority }: { src: string; w: number; h: number; className?: string; priority?: boolean }) {

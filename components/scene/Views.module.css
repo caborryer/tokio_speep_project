@@ -252,9 +252,9 @@
 }
 .mCopy {
   left: calc(var(--u) * 281);
-  top: calc(var(--u) * 379);
-  width: calc(var(--u) * 760);
-  font-size: calc(var(--u) * 33);
+  top: calc(var(--u) * 372);
+  width: calc(var(--u) * 800);
+  font-size: calc(var(--u) * 29);
   line-height: 1.27;
 }
 .quote {

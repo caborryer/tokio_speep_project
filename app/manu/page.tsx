@@ -2,9 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Icon from "@/components/scene/Icon";
-import { Lines, LOREM_3 } from "@/components/scene/Lorem";
+import { Lines } from "@/components/scene/Lorem";
 import Scene from "@/components/scene/Scene";
 import v from "@/components/scene/Views.module.css";
+
+const MANU_COPY = [
+  "CORREDOR, EDUCADOR, INSPIRACIÓN.",
+  "Tengo 40 años, soy licenciado en Educación Física y llevo más de 23 años corriendo.",
+  "Mi pasión es desafiar la distancia.",
+];
 
 export const metadata: Metadata = {
   title: "Manuel Agudelo | El Reto 500 Kilómetros",
@@ -33,7 +39,7 @@ export default function ManuPage() {
         <h1 className={`${v.gothic} ${v.mTitle}`}>Manuel Agudelo</h1>
 
         <p className={`${v.copy} ${v.mCopy}`}>
-          <Lines lines={LOREM_3} />
+          <Lines lines={MANU_COPY} />
         </p>
 
         <p className={v.quote}>“CALLATE Y CORRE”</p>

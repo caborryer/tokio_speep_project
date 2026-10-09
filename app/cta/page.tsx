@@ -56,7 +56,7 @@ export default function CTAPage() {
           gap: '1rem',
           textDecoration: 'none'
         }}>
-          DONA UN KM <span>→</span>
+          COMPRA UN KM <span>→</span>
         </Link>
         <br />
 

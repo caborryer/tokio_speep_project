@@ -3,9 +3,15 @@
 import Image from "next/image";
 import { useState } from "react";
 import Icon from "@/components/scene/Icon";
-import { Lines, LOREM_9 } from "@/components/scene/Lorem";
+import { Lines } from "@/components/scene/Lorem";
 import Scene from "@/components/scene/Scene";
 import v from "@/components/scene/Views.module.css";
+
+const RETO_COPY = [
+  "500 km de Los Ángeles a Las Vegas a través del Death Valley.",
+  "Creada en 2013, solo por invitación. Participan 30 personas.",
+  "Sin reglas. Cada uno planea su estrategia para llegar en el menor tiempo posible.",
+];
 
 /**
  * Video del recuadro amarillo. Pon aquí la URL del video:
@@ -70,7 +76,7 @@ export default function RetoPage() {
         </div>
 
         <p className={`${v.copy} ${v.hCopy}`}>
-          <Lines lines={LOREM_9} />
+          <Lines lines={RETO_COPY} />
         </p>
 
         <div className={v.video}>

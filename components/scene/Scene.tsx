@@ -65,7 +65,7 @@ export default function Scene({ bg, map, stats, children }: Props) {
         <nav className={styles.nav} aria-label="Principal">
           <Link href="/" className={styles.tag}>Inicio</Link>
           <Link href="/reto" className={styles.tag}>El Reto</Link>
-          <Link href="/dona" className={styles.tag}>Dona un km</Link>
+          <Link href="/dona" className={styles.tag}>Compra un km</Link>
           <Link href="/manu" className={styles.tag}>Manu</Link>
           <Link href="/marcas" className={styles.tag}>Marcas</Link>
           <Link href="/road-to-500" className={styles.tag}>Road to 500</Link>

@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Icon from "@/components/scene/Icon";
-import { Lines, LOREM_3 } from "@/components/scene/Lorem";
+import { Lines } from "@/components/scene/Lorem";
 import Scene from "@/components/scene/Scene";
 import v from "@/components/scene/Views.module.css";
 import type { IconName } from "@/lib/sceneIcons";
+
+const MARCAS_COPY = [
+  "Tu marca también corre esta historia.",
+  "Más que un patrocinio, es una plataforma de contenido, experiencias y comunidad.",
+];
 
 export const metadata: Metadata = {
   title: "Tu Marca | El Reto 500 Kilómetros",
@@ -20,7 +25,7 @@ type Benefit = { icon: IconName; label: string; l: number; t: number; w: number 
 const BENEFITS: Benefit[] = [
   { icon: "ojo", label: "Visibilidad", l: 96, t: 550, w: 93 },
   { icon: "celular", label: "Contenido real", l: 350, t: 558, w: 92 },
-  { icon: "megafono", label: "Experiencias", l: 624, t: 552, w: 72 },
+  { icon: "megafono", label: "Experiencias", l: 690, t: 552, w: 72 },
   { icon: "zapatilla", label: "Comunidad", l: 228, t: 660, w: 129 },
   { icon: "medalla", label: "Propósito", l: 547, t: 662, w: 77 },
 ];
@@ -59,7 +64,7 @@ export default function MarcasPage() {
         <h1 className={`${v.gothic} ${v.kTitle}`}>Tu Marca</h1>
 
         <p className={`${v.copy} ${v.kCopy}`}>
-          <Lines lines={LOREM_3} />
+          <Lines lines={MARCAS_COPY} />
         </p>
 
         <div className={v.benefits}>

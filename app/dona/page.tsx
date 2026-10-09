@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import Icon from "@/components/scene/Icon";
-import { Lines, LOREM_3 } from "@/components/scene/Lorem";
+import { Lines } from "@/components/scene/Lorem";
 import Scene from "@/components/scene/Scene";
 import v from "@/components/scene/Views.module.css";
+
+const DONA_COPY = [
+  "Tu aporte se convierte en kilómetros reales para llevar a Manu a la meta.",
+];
 
 export const metadata: Metadata = {
   title: "Dona un km | El Reto 500 Kilómetros",
@@ -41,7 +45,7 @@ export default function DonaPage() {
         </h1>
 
         <p className={`${v.copy} ${v.dCopy}`}>
-          <Lines lines={LOREM_3} />
+          <Lines lines={DONA_COPY} />
         </p>
 
         <div className={v.progress}>
