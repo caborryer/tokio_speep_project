@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import DinoLoader from "@/components/DinoLoader";
+import FitStage from "@/components/FitStage";
 import Icon from "@/components/scene/Icon";
 import { PRELAUNCH } from "@/lib/siteConfig";
 import styles from "@/components/Home.module.css";
@@ -20,7 +21,7 @@ const HOME_ASSETS = [
   "/home/city.svg",
   "/home/death-valley.svg",
   "/home/las-vegas.svg",
-  "/home/bocadillo.svg",
+  "/home/logo.webp",
   "/home/estrella-mapa.svg",
   "/home/brujula.svg",
   "/home/encendedor.svg",
@@ -57,6 +58,7 @@ export default function Home() {
           <div className={styles.bgPuntos} />
         </div>
 
+        <FitStage className={styles.fit}>
         <div className={styles.stage}>
           <nav className={styles.nav} aria-label="Principal">
             <Link href="/" className={styles.tag}>Inicio</Link>
@@ -102,9 +104,7 @@ export default function Home() {
               <div className={styles.mVegas}><Pic src="/home/las-vegas.svg" w={680} h={672} className={styles.line} /></div>
               <div className={styles.mHead}><Icon name="manu-pixel" className={styles.img} /></div>
               <div className={styles.mStart}><Icon name="start" className={styles.img} /></div>
-              <div className={styles.mBubble}><Pic src="/home/bocadillo.svg" w={657} h={588} /></div>
-              {/* Reemplaza este texto por el logo real de la marca (SVG) cuando lo tengas */}
-              <div className={styles.brand}>éx<span className={styles.i}>ı</span>to</div>
+              <div className={styles.mBubble}><Pic src="/home/logo.webp" w={450} h={450} /></div>
               <div className={styles.mStar}><Pic src="/home/estrella-mapa.svg" w={347} h={331} /></div>
             </div>
           </div>
@@ -118,6 +118,7 @@ export default function Home() {
             <div className={`${styles.sTxt} ${styles.sGoal}`}>La<br />Meta</div>
           </div>
         </div>
+        </FitStage>
       </main>
     </>
   );

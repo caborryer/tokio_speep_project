@@ -31,7 +31,7 @@ const BENEFITS: Benefit[] = [
 ];
 
 /** Etiquetas sobre la camioneta (coordenadas locales del diseño: x, y, ancho, alto, rotación, tamaño de letra). */
-type Mark = { x: number; y: number; w: number; h: number; r: number; f?: number; text: string; kind?: "win" | "lamp" };
+type Mark = { x: number; y: number; w: number; h: number; r: number; f?: number; text: string; kind?: "win" | "lamp" | "logo" };
 const MARKS: Mark[] = [
   // banderas
   { x: 98, y: 30, w: 118, h: 30, r: -11, f: 17, text: "Tu marca" },
@@ -44,8 +44,8 @@ const MARKS: Mark[] = [
   // carrocería
   { x: 290, y: 346, w: 142, h: 33, r: -1, f: 17, text: "Tu marca" },
   { x: 226, y: 425, w: 66, h: 36, r: -3, f: 11, text: "Tu marca" },
-  { x: 500, y: 350, w: 114, h: 106, r: -4, f: 15, text: "Tu marca puede estar aquí" },
-  { x: 660, y: 365, w: 152, h: 74, r: -3, f: 15, text: "Tu marca puede estar aquí" },
+  { x: 507, y: 353, w: 100, h: 100, r: -4, text: "", kind: "logo" },
+  { x: 696, y: 358, w: 90, h: 90, r: -3, text: "", kind: "logo" },
   { x: 838, y: 380, w: 28, h: 52, r: 0, text: "", kind: "lamp" },
 ];
 
@@ -93,12 +93,16 @@ export default function MarcasPage() {
             <span
               key={i}
               aria-hidden="true"
-              className={`${v.tm} ${m.kind === "win" ? v.tmWin : ""} ${m.kind === "lamp" ? v.tmLamp : ""}`}
+              className={`${v.tm} ${m.kind === "win" ? v.tmWin : ""} ${m.kind === "lamp" ? v.tmLamp : ""} ${m.kind === "logo" ? v.tmLogo : ""}`}
               style={
                 { "--x": m.x, "--y": m.y, "--w": m.w, "--h": m.h, "--r": m.r, "--f": m.f ?? 17 } as React.CSSProperties
               }
             >
-              {m.text}
+              {m.kind === "logo" ? (
+                <Image src="/home/logo.webp" alt="" width={450} height={450} unoptimized draggable={false} />
+              ) : (
+                m.text
+              )}
             </span>
           ))}
         </div>

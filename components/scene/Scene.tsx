@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import Icon from "./Icon";
+import FitStage from "../FitStage";
 import type { IconName } from "@/lib/sceneIcons";
 import styles from "./Scene.module.css";
 
@@ -61,11 +62,12 @@ export default function Scene({ bg, map, stats, children }: Props) {
         <div className={styles.dots} />
       </div>
 
+      <FitStage className={styles.fit}>
       <div className={styles.stage}>
         <nav className={styles.nav} aria-label="Principal">
           <Link href="/" className={styles.tag}>Inicio</Link>
           <Link href="/reto" className={styles.tag}>El Reto</Link>
-          <Link href="/dona" className={styles.tag}>Compra un km</Link>
+          <Link href="/dona" className={styles.tag}>Dona un km</Link>
           <Link href="/manu" className={styles.tag}>Manu</Link>
           <Link href="/marcas" className={styles.tag}>Marcas</Link>
           <Link href="/road-to-500" className={styles.tag}>Road to 500</Link>
@@ -91,9 +93,7 @@ export default function Scene({ bg, map, stats, children }: Props) {
               )}
               {map.bubble && (
                 <div className={styles.mBubble} style={at(map.bubble)}>
-                  <Pic src="/home/bocadillo.svg" w={657} h={588} />
-                  {/* Reemplaza este texto por el logo real de la marca (SVG) cuando lo tengas */}
-                  <span className={styles.brand}>éx<span className={styles.i}>ı</span>to</span>
+                  <Pic src="/home/logo.webp" w={450} h={450} />
                 </div>
               )}
               <div className={styles.mStar} style={at(map.star)}>
@@ -118,6 +118,7 @@ export default function Scene({ bg, map, stats, children }: Props) {
           <div className={`${styles.sTxt} ${styles.sT3}`}>La<br />Meta</div>
         </div>
       </div>
+      </FitStage>
     </div>
   );
 }

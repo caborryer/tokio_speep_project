@@ -399,6 +399,15 @@
   line-height: 1.05;
   font-size: calc(var(--k) * var(--f, 17));
 }
+.tmLogo {
+  background: none;
+}
+.tmLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
 .tmWin {
   background: none;
   color: #fff;
@@ -500,7 +509,7 @@
 /* =====================================================================
    Móvil / tablet
    ===================================================================== */
-@container (max-width: 899px) {
+@container (max-width: 899px) and (max-aspect-ratio: 1/1) {
   .content {
     display: flex;
     flex-direction: column;
@@ -770,7 +779,7 @@
   }
 }
 
-@container (min-width: 900px) {
+@container not ((max-width: 899px) and (max-aspect-ratio: 1/1)) {
   .progress,
   .progressRow,
   .benefits,

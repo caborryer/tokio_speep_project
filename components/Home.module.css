@@ -21,13 +21,12 @@
 
 .home {
   position: relative;
-  container-type: inline-size;
+  container-type: size; /* cqw / cqh = tamaño real de la pantalla */
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh; /* nunca más alto que la pantalla: sin scroll vertical */
   background: #050505;
   overflow: hidden;
-  display: flex;
-  align-items: flex-end; /* el escenario se ancla abajo: Manu siempre toca el borde inferior */
   font-family: 'Futura TSP', 'Futura', 'Jost', 'Century Gothic', sans-serif;
   color: #fff;
 }
@@ -68,11 +67,23 @@
 }
 
 /* ---------- Escenario 1920 x 1080 (todo escala con --u) ---------- */
-.stage {
-  --u: calc(100cqw / 1920);
+/* Envoltorio que (solo en móvil vertical) reduce el contenido hasta que cabe: ver FitStage.tsx */
+.fit {
+  --s: 1;
   position: relative;
   z-index: 1;
   width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* el escenario se ancla abajo: Manu siempre toca el borde inferior */
+}
+/* El escenario cabe completo (ancho y alto) y se centra; el fondo llena el resto */
+.stage {
+  --u: min(calc(100cqw / 1920), calc(100cqh / 1080));
+  position: relative;
+  flex: none;
+  width: calc(var(--u) * 1920);
   aspect-ratio: 16 / 9;
 }
 
@@ -212,6 +223,7 @@
 .mSanta { left: calc(var(--u) * 10); top: calc(var(--u) * 135); width: calc(var(--u) * 268); height: calc(var(--u) * 118); }
 .mCity { left: calc(var(--u) * 635); top: calc(var(--u) * 258); width: calc(var(--u) * 238); height: calc(var(--u) * 73); }
 .mDeath { left: calc(var(--u) * 820); top: calc(var(--u) * 33); width: calc(var(--u) * 325); height: calc(var(--u) * 184); }
+.mBubble img { object-fit: contain; }
 .mBubble { left: calc(var(--u) * 1145); top: calc(var(--u) * 20); width: calc(var(--u) * 206); height: calc(var(--u) * 184); }
 .mVegas { left: calc(var(--u) * 1515); top: calc(var(--u) * 7); width: calc(var(--u) * 182); height: calc(var(--u) * 180); }
 
@@ -277,8 +289,16 @@
 }
 
 /* ---------- Móvil / tablet: composición apilada ---------- */
-@container (max-width: 899px) {
+@container (max-width: 899px) and (max-aspect-ratio: 1/1) {
+  .fit {
+    align-items: flex-start;
+    height: calc(100% / var(--s));
+    transform: scale(var(--s));
+    transform-origin: 50% 0;
+  }
   .stage {
+    width: 100%;
+    flex: 1 1 auto;
     aspect-ratio: auto;
     display: flex;
     flex-direction: column;
@@ -383,7 +403,7 @@
   }
 }
 
-@container (min-width: 900px) {
+@container not ((max-width: 899px) and (max-aspect-ratio: 1/1)) {
   .copy span {
     display: block;
   }
