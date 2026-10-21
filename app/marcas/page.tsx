@@ -44,8 +44,8 @@ const MARKS: Mark[] = [
   // carrocería
   { x: 290, y: 346, w: 142, h: 33, r: -1, f: 17, text: "Tu marca" },
   { x: 226, y: 425, w: 66, h: 36, r: -3, f: 11, text: "Tu marca" },
-  { x: 507, y: 353, w: 100, h: 100, r: -4, text: "", kind: "logo" },
-  { x: 696, y: 358, w: 90, h: 90, r: -3, text: "", kind: "logo" },
+  { x: 489, y: 343, w: 96, h: 96, r: 0, text: "", kind: "logo" },
+  { x: 655, y: 341, w: 96, h: 96, r: 0, text: "", kind: "logo" },
   { x: 838, y: 380, w: 28, h: 52, r: 0, text: "", kind: "lamp" },
 ];
 
