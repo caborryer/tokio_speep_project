@@ -11,6 +11,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Todo menos: "/", _next, favicon, carpetas de assets y cualquier archivo con extensión
-  matcher: ["/((?!$|_next/|favicon.ico|loader/|home/|fonts/|.*\\..*).*)"],
+  // Todo menos: "/", _next, api (ranking), favicon, carpetas de assets y cualquier archivo con extensión
+  matcher: ["/((?!$|_next/|api/|favicon.ico|loader/|home/|fonts/|.*\\..*).*)"],
 };

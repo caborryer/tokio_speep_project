@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import styles from "./DinoLoader.module.css";
-import { startDinoGame } from "./dinoGame";
+import { startDinoGame, type DinoControls } from "./dinoGame";
+import Leaderboard from "./Leaderboard";
+import { fetchSession, type Session } from "@/lib/leaderboardClient";
 
 /** Para no repetir el loader al navegar de vuelta al inicio sin recargar. */
 let hasShown = false;
@@ -45,6 +47,23 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
   /** Momento en que el juego empezó a correr (el tiempo mínimo se cuenta desde ahí). */
   const gameStartRef = useRef<number | null>(null);
 
+  // ---------- Ranking global (solo en el modo prelanzamiento, que es el juego permanente) ----------
+  const controlsRef = useRef<DinoControls | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const panelTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [panel, setPanel] = useState<null | { score: number | null }>(null);
+  const openPanel = (score: number | null) => {
+    controlsRef.current?.setLocked(true); // pausa el juego y libera el teclado para el formulario
+    msgRef.current?.classList.remove(styles.show);
+    setPanel({ score });
+  };
+  const closePanel = () => {
+    const wasGameOver = panel?.score != null;
+    setPanel(null);
+    controlsRef.current?.setLocked(false);
+    if (wasGameOver) controlsRef.current?.restart();
+  };
+
   // Bloquea el scroll de la página mientras el loader está visible
   useEffect(() => {
     if (phase === "done") return;
@@ -54,6 +73,19 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
       document.body.style.overflow = prev;
     };
   }, [phase]);
+
+  // Al terminar la carga el juego debe detenerse del todo: teclado, sonido y loop de KAPLAY.
+  // (Antes seguía vivo detrás de la página: se oían los sonidos al teclear y fallaba el canvas ya desmontado.)
+  const doneRef = useRef(phase === "done");
+  useEffect(() => {
+    doneRef.current = phase === "done";
+    if (persistent) return;
+    if (phase === "leaving") controlsRef.current?.setLocked(true);
+    if (phase === "done") {
+      controlsRef.current?.stop();
+      controlsRef.current = null;
+    }
+  }, [phase, persistent]);
 
   // ---------- Juego (KAPLAY) ----------
   useEffect(() => {
@@ -82,8 +114,20 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
       onScore: (s) => {
         if (scoreRef.current) scoreRef.current.textContent = pad(s);
       },
+      onRunStart: () => {
+        if (!persistent) return;
+        setSession(null);
+        fetchSession().then(setSession);
+      },
       onGameOver: (s) => {
         msgRef.current?.classList.add(styles.show);
+        if (persistent) {
+          // Si no reinicia enseguida, se abre el panel para guardar el puntaje / ver el ranking
+          clearTimeout(panelTimer.current);
+          panelTimer.current = setTimeout(() => {
+            if (controlsRef.current && !controlsRef.current.isAlive()) openPanel(s);
+          }, 900);
+        }
         if (s > bestRef.current) {
           bestRef.current = s;
           if (hiRef.current) hiRef.current.textContent = `HI ${pad(s)}`;
@@ -94,21 +138,29 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
           }
         }
       },
-      onRestart: () => msgRef.current?.classList.remove(styles.show),
+      onRestart: () => {
+        clearTimeout(panelTimer.current);
+        msgRef.current?.classList.remove(styles.show);
+      },
     }, ctrl.signal)
-      .then((cleanup) => {
-        if (cancelled) cleanup();
-        else stop = cleanup;
+      .then((controls) => {
+        if (cancelled || doneRef.current) controls.stop();
+        else {
+          controlsRef.current = controls;
+          stop = controls.stop;
+        }
       })
       .catch((err) => console.warn("[DinoLoader] El juego no pudo iniciar:", err));
 
     return () => {
       cancelled = true;
+      clearTimeout(panelTimer.current);
+      controlsRef.current = null;
       ctrl.abort();
       stop?.();
       canvas.remove();
     };
-  }, []);
+  }, [persistent]);
 
   // ---------- Progreso real de carga ----------
   useEffect(() => {
@@ -193,12 +245,18 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
   return (
     <div
       className={`${styles.overlay} ${phase === "leaving" ? styles.leaving : ""}`}
-      role="progressbar"
+      role={persistent ? undefined : "progressbar"}
       aria-label="Cargando The 500 KM Project"
-      aria-busy={phase === "loading"}
+      aria-busy={persistent ? undefined : phase === "loading"}
     >
       <div className={styles.grid} />
       <div className={styles.canvasWrap} ref={canvasWrapRef} />
+
+      {persistent && (
+        <button type="button" className={styles.rankBtn} onClick={() => openPanel(null)}>
+          RANKING
+        </button>
+      )}
 
       <div className={styles.hud} aria-hidden="true">
         <span className={styles.hi} ref={hiRef}>HI 00000</span>
@@ -238,8 +296,17 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
       </div>
 
       <div className={styles.hint} aria-hidden="true">
-        ESPACIO / TOCA PARA SALTAR
+        ESPACIO / TOCA PARA SALTAR · ↓ PARA AGACHARTE
       </div>
+
+      {persistent && panel && (
+        <Leaderboard
+          score={panel.score}
+          session={session}
+          playLabel={panel.score !== null ? "JUGAR DE NUEVO" : "SEGUIR JUGANDO"}
+          onPlay={closePanel}
+        />
+      )}
     </div>
   );
 }

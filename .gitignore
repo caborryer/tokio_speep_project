@@ -46,3 +46,7 @@ next-env.d.ts
 .agents
 .opencode
 openspec
+
+# playwright
+/test-results/
+/playwright-report/
