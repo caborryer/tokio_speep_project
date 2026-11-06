@@ -122,11 +122,12 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
       onGameOver: (s) => {
         msgRef.current?.classList.add(styles.show);
         if (persistent) {
-          // Si no reinicia enseguida, se abre el panel para guardar el puntaje / ver el ranking
+          // El panel se abre ANTES de que el juego acepte reiniciar (0,45 s), así nadie se lo salta
+          // con un toque / espacio seguido; el juego queda pausado hasta que se pulse "Jugar de nuevo".
           clearTimeout(panelTimer.current);
           panelTimer.current = setTimeout(() => {
             if (controlsRef.current && !controlsRef.current.isAlive()) openPanel(s);
-          }, 900);
+          }, 350);
         }
         if (s > bestRef.current) {
           bestRef.current = s;
@@ -178,12 +179,19 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
     const bump = () => {
       loadedAssets += 1;
     };
-    assets.forEach((src) => {
-      const img = new Image();
-      img.onload = bump;
-      img.onerror = bump; // un asset roto no debe trabar el loader
-      img.src = src;
-    });
+    // Las imágenes de la página se piden DESPUÉS de que el juego arranca (o a los 4 s como máximo),
+    // para que sus propios archivos (sprites, KAPLAY) no compitan por el ancho de banda.
+    let preloading = false;
+    const startPreload = () => {
+      if (preloading) return;
+      preloading = true;
+      assets.forEach((src) => {
+        const img = new Image();
+        img.onload = bump;
+        img.onerror = bump; // un asset roto no debe trabar el loader
+        img.src = src;
+      });
+    };
 
     document.fonts?.ready.then(() => (fontsReady = true)).catch(() => (fontsReady = true));
     if (!document.fonts) fontsReady = true;
@@ -203,6 +211,7 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
 
     const tick = () => {
       const now = performance.now();
+      if (!preloading && (gameStartRef.current !== null || now - start > 4000)) startPreload();
       // El tiempo mínimo cuenta desde que el juego arranca, para que siempre alcancen a jugar.
       // Si el juego no logra iniciar en 6 s, se usa el reloj de la página como respaldo.
       const playStart = gameStartRef.current ?? (now - start > 6000 ? start : now);

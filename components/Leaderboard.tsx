@@ -87,9 +87,22 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Anti-"pasa muy rápido": quien está mal (espacio / toques seguidos para reintentar) no debe cerrar el panel
+  // sin querer. El botón de jugar solo se activa ~1 s después de abrir el panel o de cambiar de vista.
+  const armedAt = useRef(0);
   useEffect(() => {
-    (view === "form" ? firstField.current : playBtn.current)?.focus({ preventScroll: true });
+    armedAt.current = performance.now() + 1000;
+    if (view === "form") {
+      firstField.current?.focus({ preventScroll: true });
+      return;
+    }
+    const t = setTimeout(() => playBtn.current?.focus({ preventScroll: true }), 1000);
+    return () => clearTimeout(t);
   }, [view]);
+  const play = () => {
+    if (performance.now() < armedAt.current) return;
+    onPlay();
+  };
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -123,7 +136,7 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
               <input
                 ref={firstField}
                 value={nick}
-                onChange={(e) => setNick(e.target.value)}
+                onChange={(e) => setNick(e.target.value.replace(/^\s+/, ""))}
                 maxLength={16}
                 autoComplete="nickname"
                 placeholder="MANU500"
@@ -216,7 +229,7 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
           </>
         )}
 
-        <button ref={playBtn} type="button" className={styles.btn} onClick={onPlay}>
+        <button ref={playBtn} type="button" className={styles.btn} onClick={play}>
           {playLabel}
         </button>
       </div>

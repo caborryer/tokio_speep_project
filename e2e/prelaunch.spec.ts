@@ -58,7 +58,23 @@ test.describe("ranking", () => {
     await expect(dialog).toContainText(/RANKING/i);
     await expect(dialog).toContainText(`T${id}`);
 
+    await page.waitForTimeout(1200); // el botón se activa ~1 s después de cambiar de vista (anti toque accidental)
     await dialog.getByRole("button", { name: /JUGAR DE NUEVO/i }).click();
     await expect(dialog).toHaveCount(0);
+  });
+
+  test("el panel no se cierra solo aunque el usuario siga pulsando espacio / tocando", async ({ page }) => {
+    await page.goto("/");
+    const dialog = page.getByRole("dialog");
+    // Mientras juega, pulsa espacio sin parar (como un jugador ansioso)
+    const spam = setInterval(() => void page.keyboard.press("Space").catch(() => {}), 70);
+    try {
+      await expect(dialog).toBeVisible({ timeout: 25_000 });
+      await page.waitForTimeout(2500); // sigue pulsando después de perder
+      await expect(dialog).toBeVisible();
+      await expect(dialog.locator("input[autocomplete=nickname]")).toBeVisible();
+    } finally {
+      clearInterval(spam);
+    }
   });
 });
