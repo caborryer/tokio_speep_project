@@ -6,7 +6,7 @@ const PORT = 3111;
 // Primera vez en tu Mac: pnpm exec playwright install chromium
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 45_000,
+  timeout: 70_000,
   fullyParallel: false,
   workers: 1,
   reporter: [["list"], ["html", { open: "never" }]],

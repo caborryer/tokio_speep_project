@@ -42,9 +42,12 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
   const canSave = score !== null && score > 0 && !!session;
   const [top, setTop] = useState<TopRow[] | null>(null);
   const [configured, setConfigured] = useState(true);
-  const [view, setView] = useState<"form" | "ranking">(score !== null && score > 0 ? "form" : "ranking");
   // Este panel solo se monta después de una acción del jugador (nunca en el servidor): leer localStorage aquí es seguro
   const [saved] = useState<Profile | null>(() => loadProfile());
+  // Jugador nuevo → formulario. Jugador ya registrado → confirmar (nunca se guarda ni se salta nada sin que lo decida).
+  const [view, setView] = useState<"form" | "confirm" | "ranking">(
+    score !== null && score > 0 ? (saved ? "confirm" : "form") : "ranking",
+  );
   const [profile, setProfile] = useState<Profile | null>(saved);
   const [nick, setNick] = useState(saved?.nick ?? "");
   const [email, setEmail] = useState(saved?.email ?? "");
@@ -83,8 +86,6 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
       setTop((cur) => cur ?? r.top);
       if (!r.configured) setView("ranking");
     });
-    if (saved && canSave) queueMicrotask(() => void save(saved));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Anti-"pasa muy rápido": quien está mal (espacio / toques seguidos para reintentar) no debe cerrar el panel
@@ -128,7 +129,37 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
           </p>
         )}
 
-        {view === "form" && configured ? (
+        {view === "confirm" && configured && profile ? (
+          <div className={styles.form}>
+            <p className={styles.pHelp}>
+              JUGANDO COMO <strong>{profile.nick}</strong>
+            </p>
+            {error && <p className={styles.err}>{error}</p>}
+            <div className={styles.actions}>
+              <button type="button" className={styles.btn} disabled={busy || !canSave} onClick={() => void save(profile)}>
+                {busy ? "GUARDANDO..." : "GUARDAR PUNTAJE"}
+              </button>
+              <button type="button" className={styles.btnGhost} onClick={() => setView("ranking")}>
+                VER RANKING
+              </button>
+              <button
+                type="button"
+                className={styles.btnGhost}
+                onClick={() => {
+                  clearProfile();
+                  setProfile(null);
+                  setNick("");
+                  setEmail("");
+                  setConsent(false);
+                  setView("form");
+                }}
+              >
+                CAMBIAR DE JUGADOR
+              </button>
+            </div>
+            {!canSave && <p className={styles.pHelp}>SIN CONEXIÓN CON EL RANKING: INTENTA JUGAR OTRA VEZ</p>}
+          </div>
+        ) : view === "form" && configured ? (
           <form onSubmit={onSubmit} className={styles.form} noValidate>
             <p className={styles.pHelp}>ENTRA AL RANKING GLOBAL Y COMPITE POR PREMIOS DE LAS MARCAS</p>
             <label className={styles.field}>
@@ -202,7 +233,7 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
               </ol>
             )}
             {score !== null && score > 0 && configured && !result && (
-              <button type="button" className={styles.btnGhost} onClick={() => setView("form")}>
+              <button type="button" className={styles.btnGhost} onClick={() => setView(profile ? "confirm" : "form")}>
                 GUARDAR MI PUNTAJE
               </button>
             )}
