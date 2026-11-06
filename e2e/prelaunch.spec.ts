@@ -95,4 +95,22 @@ test.describe("ranking", () => {
     await dialog.getByRole("button", { name: /GUARDAR PUNTAJE/i }).click();
     await expect(dialog).toContainText(/ESTÁS #|SIGUES #/);
   });
+
+  test("ranking sin configurar (ej. Redis aún no conectado): nunca parpadea el formulario", async ({ page }) => {
+    await page.route("**/api/scores", async (route) => {
+      if (route.request().method() === "GET") {
+        await new Promise((r) => setTimeout(r, 600)); // servidor lento
+        return route.fulfill({ json: { configured: false, top: [] } });
+      }
+      return route.continue();
+    });
+    await page.goto("/");
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible({ timeout: 40_000 });
+    for (let i = 0; i < 12; i++) {
+      await expect(dialog.locator("input[autocomplete=nickname]")).toHaveCount(0);
+      await page.waitForTimeout(100);
+    }
+    await expect(dialog).toContainText(/MUY PRONTO/i);
+  });
 });

@@ -41,7 +41,8 @@ type Props = {
 export default function Leaderboard({ score, session, playLabel, onPlay }: Props) {
   const canSave = score !== null && score > 0 && !!session;
   const [top, setTop] = useState<TopRow[] | null>(null);
-  const [configured, setConfigured] = useState(true);
+  // null = aún no sabemos si el ranking está configurado en el servidor: no se muestra el formulario hasta saberlo
+  const [configured, setConfigured] = useState<boolean | null>(null);
   // Este panel solo se monta después de una acción del jugador (nunca en el servidor): leer localStorage aquí es seguro
   const [saved] = useState<Profile | null>(() => loadProfile());
   // Jugador nuevo → formulario. Jugador ya registrado → confirmar (nunca se guarda ni se salta nada sin que lo decida).
@@ -94,12 +95,15 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
   useEffect(() => {
     armedAt.current = performance.now() + 1000;
     if (view === "form") {
-      firstField.current?.focus({ preventScroll: true });
+      firstField.current?.focus({ preventScroll: true }); // (el formulario aparece cuando el servidor confirma el ranking)
       return;
     }
     const t = setTimeout(() => playBtn.current?.focus({ preventScroll: true }), 1000);
     return () => clearTimeout(t);
   }, [view]);
+  useEffect(() => {
+    if (view === "form" && configured === true) firstField.current?.focus({ preventScroll: true });
+  }, [view, configured]);
   const play = () => {
     if (performance.now() < armedAt.current) return;
     onPlay();
@@ -129,7 +133,7 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
           </p>
         )}
 
-        {view === "confirm" && configured && profile ? (
+        {view === "confirm" && configured === true && profile ? (
           <div className={styles.form}>
             <p className={styles.pHelp}>
               JUGANDO COMO <strong>{profile.nick}</strong>
@@ -159,7 +163,7 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
             </div>
             {!canSave && <p className={styles.pHelp}>SIN CONEXIÓN CON EL RANKING: INTENTA JUGAR OTRA VEZ</p>}
           </div>
-        ) : view === "form" && configured ? (
+        ) : view === "form" && configured === true ? (
           <form onSubmit={onSubmit} className={styles.form} noValidate>
             <p className={styles.pHelp}>ENTRA AL RANKING GLOBAL Y COMPITE POR PREMIOS DE LAS MARCAS</p>
             <label className={styles.field}>
@@ -215,7 +219,7 @@ export default function Leaderboard({ score, session, playLabel, onPlay }: Props
               </p>
             )}
             {error && <p className={styles.err}>{error}</p>}
-            {!configured ? (
+            {configured === false ? (
               <p className={styles.pHelp}>EL RANKING GLOBAL ESTARÁ DISPONIBLE MUY PRONTO</p>
             ) : top === null ? (
               <p className={styles.pHelp}>CARGANDO...</p>
