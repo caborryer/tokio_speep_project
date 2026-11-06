@@ -12,6 +12,34 @@ export type DinoCallbacks = {
   onGameOver?: (score: number) => void;
   /** El jugador reinició después de chocar. */
   onRestart?: () => void;
+  /** Empieza una partida nueva (la primera y cada reinicio): útil para pedir el token del ranking. */
+  onRunStart?: () => void;
+};
+
+/** Control del juego desde fuera (React). */
+export type DinoControls = {
+  stop: () => void;
+  /** Reinicia la partida si Manuel ya chocó. */
+  restart: () => void;
+  /** Pausa el juego e ignora el teclado/toques (por ejemplo, mientras hay un panel abierto). */
+  setLocked: (locked: boolean) => void;
+  isAlive: () => boolean;
+};
+
+type ObstacleKind = "cactus1" | "cactus2" | "cactusBig" | "cactusTriple" | "rock" | "weed" | "birdLow" | "birdHigh";
+
+/** Cuerpo de colisión de un obstáculo (centro-abajo en px, relativo al suelo). */
+type Obstacle = {
+  obj: { pos: { x: number; y: number }; destroy: () => void; width?: number };
+  kind: ObstacleKind;
+  /** Multiplicador de velocidad respecto al suelo (>1: se acerca más rápido). */
+  rel: number;
+  hw: number; // semiancho de la caja
+  hh: number; // semialto de la caja
+  /** Altura (px) del centro de la caja sobre el suelo. */
+  cy: () => number;
+  /** Animación propia (aleteo, rodar...). */
+  tick?: (dt: number, step: number) => void;
 };
 
 const SPRITES = {
@@ -26,10 +54,11 @@ export async function startDinoGame(
   canvas: HTMLCanvasElement,
   cb: DinoCallbacks = {},
   signal?: AbortSignal,
-): Promise<() => void> {
+): Promise<DinoControls> {
+  const noop: DinoControls = { stop: () => {}, restart: () => {}, setLocked: () => {}, isAlive: () => false };
   const { default: kaplay } = await import("kaplay");
   // En React StrictMode (dev) el efecto se monta/desmonta dos veces: no inicializar si ya se canceló
-  if (signal?.aborted) return () => {};
+  if (signal?.aborted) return noop;
 
   // Tamaño lógico del "mundo". En vertical (celular) usamos un mundo más angosto.
   const portrait = window.innerWidth < window.innerHeight * 0.85;
@@ -63,7 +92,7 @@ export async function startDinoGame(
 
   if (signal?.aborted) {
     k.quit();
-    return () => {};
+    return noop;
   }
 
   // ---------- Constantes de juego ----------
@@ -72,11 +101,19 @@ export async function startDinoGame(
   const GRAVITY = 1900;
   const JUMP_V = 800;
   const START_SPEED = 240;
-  const MAX_SPEED = 380;
+  const MAX_SPEED = 560;
+  const SPEED_RAMP = 0.012; // px/s extra por cada px recorrido
+  const DUCK_SCALE = 0.58; // Manuel agachado (escala vertical)
+
+  // Solo en desarrollo (se elimina del build de producción): ?dbg=700 empieza con ese puntaje y ?god=1 no muere.
+  const DEV = process.env.NODE_ENV !== "production";
+  const qs = DEV ? new URLSearchParams(window.location.search) : null;
+  const dbgStart = Number(qs?.get("dbg") ?? 0) * 25;
+  const god = DEV && qs?.get("god") === "1";
 
   // ---------- Estado ----------
   let speed = START_SPEED;
-  let distance = 0;
+  let distance = dbgStart;
   let lastScore = -1;
   let alive = true;
   let vy = 0; // velocidad vertical (px/s, + = hacia abajo)
@@ -86,6 +123,9 @@ export async function startDinoGame(
   let spawnIn = 2.4; // el siguiente cactus, después del primero
   let introT = 0;
   let deadAt = 0;
+  let ducking = false;
+  let locked = false;
+  let obstacles: Obstacle[] = [];
 
   // ---------- Fondo: desierto (estático, como en la referencia) ----------
   k.add([
@@ -141,31 +181,183 @@ export async function startDinoGame(
     k.pos(-120, GROUND_Y + 3),
     k.anchor("bot"),
     k.rotate(0),
+    k.scale(1),
     k.opacity(1),
     k.z(5),
   ]);
   const manW = man.width;
 
   // Caja de colisión de Manuel (en px, relativa a su punto "bot-center").
-  const hit = () => ({
-    l: man.pos.x - manW * 0.16,
-    r: man.pos.x + manW * 0.2,
-    t: man.pos.y - MAN_H * 0.95,
-    b: man.pos.y - MAN_H * 0.08,
-  });
+  const hit = () => {
+    const duck = ducking && lift <= 0.5;
+    return {
+      l: man.pos.x - manW * 0.16,
+      r: man.pos.x + manW * 0.2,
+      t: man.pos.y - MAN_H * 0.95 * (duck ? DUCK_SCALE : 1),
+      b: man.pos.y - MAN_H * 0.08 * (duck ? DUCK_SCALE : 1),
+    };
+  };
 
   // ---------- Obstáculos ----------
-  const spawnObstacle = (x = W + 60, single = false) => {
-    const double = !single && k.rand(0, 1) < 0.4;
-    const h = double ? 56 : 69;
+  // Se dibujan con las primitivas de KAPLAY (drawPolygon, drawCircle, drawLines...) en blanco
+  // para que combinen con el estilo del juego. Cada uno trae su propia caja de colisión.
+  const WHITE = k.rgb(255, 255, 255);
+  const INK = k.rgb(5, 5, 5);
+
+  const addCactus = (sprite: "cactus1" | "cactus2", h: number, x: number, kind: ObstacleKind) => {
+    const o = k.add([k.sprite(sprite, { height: h }), k.pos(x, GROUND_Y + 2), k.anchor("bot"), k.z(3), "obstacle"]);
+    const hh = h * 0.46;
+    obstacles.push({ obj: o, kind, rel: 1, hw: o.width * 0.25, hh, cy: () => hh - 2 });
+  };
+
+  const addRock = (x: number) => {
+    const body = [k.vec2(-34, 0), k.vec2(-27, -17), k.vec2(-11, -29), k.vec2(7, -34), k.vec2(24, -25), k.vec2(36, -9), k.vec2(35, 0)];
     const o = k.add([
-      k.sprite(double ? "cactus2" : "cactus1", { height: h }),
       k.pos(x, GROUND_Y + 2),
-      k.anchor("bot"),
       k.z(3),
+      {
+        draw() {
+          k.drawPolygon({ pts: body, color: WHITE });
+          k.drawLines({ pts: [k.vec2(-6, -30), k.vec2(-2, -18), k.vec2(-9, -10)], width: 2, color: INK });
+          k.drawLines({ pts: [k.vec2(15, -26), k.vec2(12, -14)], width: 2, color: INK });
+        },
+      },
       "obstacle",
     ]);
-    return o;
+    obstacles.push({ obj: o, kind: "rock", rel: 1, hw: 28, hh: 14, cy: () => 14 });
+  };
+
+  /** Matorral rodante: llega más rápido que el suelo y va dando saltitos. */
+  const WEED_REL = 1.28;
+  const addWeed = (x: number) => {
+    const r = 22;
+    let ang = 0;
+    let bt = k.rand(0, 6);
+    const chords: [number, number, number, number][] = [
+      [-0.75, -0.2, 0.7, 0.25],
+      [-0.3, -0.8, 0.35, 0.75],
+      [-0.7, 0.35, 0.6, -0.4],
+      [0.05, -0.95, -0.05, 0.9],
+    ];
+    const o = k.add([
+      k.pos(x, GROUND_Y - r),
+      k.z(3),
+      {
+        draw() {
+          k.pushTransform();
+          k.pushRotate(ang);
+          k.drawCircle({ radius: r, fill: false, outline: { width: 3, color: WHITE } });
+          for (const [x1, y1, x2, y2] of chords) {
+            k.drawLines({ pts: [k.vec2(x1 * r, y1 * r), k.vec2(x2 * r, y2 * r)], width: 2, color: WHITE });
+          }
+          k.popTransform();
+        },
+      },
+      "obstacle",
+    ]);
+    obstacles.push({
+      obj: o,
+      kind: "weed",
+      rel: WEED_REL,
+      hw: 17,
+      hh: 17,
+      cy: () => GROUND_Y - o.pos.y,
+      tick: (dt, sp) => {
+        bt += dt * 5;
+        o.pos.y = GROUND_Y - r - Math.abs(Math.sin(bt)) * 16;
+        ang -= ((sp * WEED_REL * dt) / r) * 57.3;
+      },
+    });
+  };
+
+  /** Pájaro: bajo (hay que saltarlo) o alto (hay que agacharse con ↓ / S, o saltarlo con buen tiempo). */
+  const BIRD_REL = 1.18;
+  const addBird = (x: number, above: number) => {
+    let t = k.rand(0, 3);
+    const o = k.add([
+      k.pos(x, GROUND_Y - above),
+      k.z(3),
+      {
+        draw() {
+          const f = Math.sin(t * 15); // aleteo
+          // cola
+          k.drawPolygon({ pts: [k.vec2(14, -1), k.vec2(30, -5), k.vec2(30, 5)], color: WHITE });
+          // ala (arriba/abajo)
+          k.drawPolygon({ pts: [k.vec2(-8, -5), k.vec2(10, -5), k.vec2(6, -5 - 24 * f)], color: WHITE });
+          // cuerpo y cabeza
+          k.drawEllipse({ radiusX: 17, radiusY: 8, color: WHITE });
+          k.drawCircle({ pos: k.vec2(-19, -3), radius: 6.5, color: WHITE });
+          k.drawPolygon({ pts: [k.vec2(-24, -5), k.vec2(-35, 0), k.vec2(-24, 0)], color: WHITE });
+          k.drawCircle({ pos: k.vec2(-21, -5), radius: 1.6, color: INK });
+        },
+      },
+      "obstacle",
+    ]);
+    obstacles.push({
+      obj: o,
+      kind: above > 50 ? "birdHigh" : "birdLow",
+      rel: BIRD_REL,
+      hw: 20,
+      hh: 11,
+      cy: () => above,
+      tick: (dt) => {
+        t += dt;
+      },
+    });
+  };
+
+  const spawn = (kind: ObstacleKind, x: number) => {
+    switch (kind) {
+      case "cactus1":
+        return addCactus("cactus1", 69, x, kind);
+      case "cactus2":
+        return addCactus("cactus2", 56, x, kind);
+      case "cactusBig":
+        return addCactus("cactus1", 104, x, kind);
+      case "cactusTriple":
+        addCactus("cactus1", 66, x, kind);
+        addCactus("cactus1", 50, x + 44, kind);
+        return addCactus("cactus1", 66, x + 88, kind);
+      case "rock":
+        return addRock(x);
+      case "weed":
+        return addWeed(x);
+      case "birdLow":
+        return addBird(x, 26);
+      case "birdHigh":
+        return addBird(x, 88);
+    }
+  };
+
+  const REL: Record<ObstacleKind, number> = {
+    cactus1: 1, cactus2: 1, cactusBig: 1, cactusTriple: 1, rock: 1, weed: WEED_REL, birdLow: BIRD_REL, birdHigh: BIRD_REL,
+  };
+
+  /** Dificultad progresiva según el puntaje: va sumando obstáculos nuevos. */
+  const pickKind = (): ObstacleKind => {
+    const sc = Math.max(0, lastScore);
+    const pool: [ObstacleKind, number][] = [["cactus1", 3], ["cactus2", 2]];
+    if (sc >= 150) pool.push(["cactusTriple", 2], ["rock", 2], ["cactusBig", 1]);
+    if (sc >= 350) pool.push(["weed", 3]);
+    if (sc >= 600) pool.push(["birdLow", 2], ["birdHigh", 3]);
+    const total = pool.reduce((a, [, w]) => a + w, 0);
+    let r = k.rand(0, total);
+    for (const [kind, w] of pool) {
+      if ((r -= w) <= 0) return kind;
+    }
+    return "cactus1";
+  };
+
+  const SPAWN_X = W + 60;
+  let nextKind: ObstacleKind = pickKind();
+  /** Segundos hasta el siguiente obstáculo: siempre deja espacio para aterrizar y reaccionar. */
+  const gapSeconds = (kind: ObstacleKind) => {
+    const minGap = speed * 0.9 + 130; // px
+    const tight = lastScore >= 350 && k.rand(0, 1) < 0.2; // a veces, obstáculos "pegados"
+    const gap = tight ? minGap + k.rand(0, 40) : minGap + k.rand(60, 460);
+    // los que llegan más rápido (pájaros, matorral) necesitan salir un poco más tarde
+    const catchUp = REL[kind] > 1 ? ((SPAWN_X - MAN_X) / speed) * (1 - 1 / REL[kind]) : 0;
+    return gap / speed + catchUp;
   };
 
   // ---------- Sonido (sintetizado con Web Audio, sin archivos) ----------
@@ -209,6 +401,7 @@ export async function startDinoGame(
 
   // ---------- Entrada ----------
   const jump = () => {
+    if (locked) return;
     unlock();
     if (!alive) {
       if (k.time() - deadAt < 0.45) return; // evita reinicio accidental
@@ -230,37 +423,72 @@ export async function startDinoGame(
     e.key === "Spacebar" ||
     e.key === "ArrowUp" ||
     e.keyCode === 32;
+  const isDuckKey = (e: KeyboardEvent) => e.code === "ArrowDown" || e.code === "KeyS" || e.key === "ArrowDown";
   const onKeyDown = (e: KeyboardEvent) => {
+    if (locked) return; // panel abierto (formulario / ranking): no robar el teclado
+    if (isDuckKey(e)) {
+      e.preventDefault();
+      ducking = true;
+      return;
+    }
     if (!isJumpKey(e)) return;
     e.preventDefault();
     if (!e.repeat) jump();
   };
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (isDuckKey(e)) ducking = false;
+  };
   window.addEventListener("keydown", onKeyDown, true);
   document.addEventListener("keydown", onKeyDown, true);
+  window.addEventListener("keyup", onKeyUp, true);
   k.onClick(jump);
+
+  // En celular: tocar = saltar; mantener el dedo y deslizar hacia abajo = agacharse.
+  let touchY0 = 0;
+  const onTouchStart = (e: TouchEvent) => {
+    touchY0 = e.touches[0]?.clientY ?? 0;
+  };
+  const onTouchMove = (e: TouchEvent) => {
+    if (!locked && (e.touches[0]?.clientY ?? 0) - touchY0 > 30) ducking = true;
+  };
+  const onTouchEnd = () => {
+    ducking = false;
+  };
+  canvas.addEventListener("touchstart", onTouchStart, { passive: true });
+  canvas.addEventListener("touchmove", onTouchMove, { passive: true });
+  canvas.addEventListener("touchend", onTouchEnd, { passive: true });
+  canvas.addEventListener("touchcancel", onTouchEnd, { passive: true });
 
   const restart = () => {
     k.destroyAll("obstacle");
-    distance = 0;
+    obstacles = [];
+    distance = dbgStart;
+    lastScore = -1;
     speed = START_SPEED;
-    spawnObstacle(W * 0.8, true);
+    spawn("cactus1", W * 0.8);
+    nextKind = pickKind();
     spawnIn = 2;
     vy = 0;
     lift = 0;
+    ducking = false;
+    man.scale = k.vec2(1, 1);
     alive = true;
     man.opacity = 1;
     man.angle = 0;
     cb.onRestart?.();
+    cb.onRunStart?.();
   };
 
   // El primer cactus ya está en pantalla desde el inicio y llega a Manuel en ~2 s,
   // cuando él ya terminó de entrar y puede saltar.
-  spawnObstacle(W * 0.72, true);
+  spawn("cactus1", W * 0.72);
 
   cb.onReady?.();
+  cb.onRunStart?.();
 
   // ---------- Loop principal ----------
   k.onUpdate(() => {
+    if (locked) return; // pausa (panel abierto)
     const dt = Math.min(k.dt(), 1 / 20);
 
     // Nubes siempre se mueven (incluso con game over)
@@ -287,7 +515,7 @@ export async function startDinoGame(
     }
 
     // Velocidad / distancia / puntaje
-    speed = Math.min(MAX_SPEED, START_SPEED + distance * 0.01);
+    speed = Math.min(MAX_SPEED, START_SPEED + distance * SPEED_RAMP);
     distance += speed * dt;
     const score = Math.floor(distance / 25);
     if (score !== lastScore) {
@@ -308,7 +536,8 @@ export async function startDinoGame(
 
     // Física del salto
     if (lift > 0 || vy < 0) {
-      vy += GRAVITY * dt;
+      vy += GRAVITY * (ducking ? 2.4 : 1) * dt; // ↓ en el aire = caída rápida
+      man.scale = k.vec2(1, 1);
       lift -= vy * dt;
       if (lift <= 0) {
         lift = 0;
@@ -322,6 +551,7 @@ export async function startDinoGame(
       man.frame = Math.floor(stepT) % 4;
       man.pos.y = GROUND_Y + 3;
       man.angle = 0;
+      man.scale = ducking ? k.vec2(1.1, DUCK_SCALE) : k.vec2(1, 1); // agachado
 
       // polvito
       dustT -= dt;
@@ -348,29 +578,34 @@ export async function startDinoGame(
     if (introT >= 1) {
       spawnIn -= dt;
       if (spawnIn <= 0) {
-        spawnObstacle(W + 60, distance < 3500); // al principio solo cactus sencillos
-        // separación mínima en píxeles => siempre hay espacio para aterrizar
-        spawnIn = k.rand(430, 800) / speed;
+        spawn(nextKind, SPAWN_X);
+        nextKind = pickKind();
+        spawnIn = gapSeconds(nextKind);
       }
     }
 
     const m = hit();
-    for (const o of k.get("obstacle")) {
-      o.pos.x -= speed * dt;
-      if (o.pos.x < -160) {
-        o.destroy();
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+      const ob = obstacles[i];
+      ob.obj.pos.x -= speed * ob.rel * dt;
+      ob.tick?.(dt, speed);
+      if (ob.obj.pos.x < -160) {
+        ob.obj.destroy();
+        obstacles.splice(i, 1);
         continue;
       }
-      const ow = o.width * 0.5;
-      const oh = o.height * 0.92;
-      const ol = o.pos.x - ow / 2;
-      const or = o.pos.x + ow / 2;
-      const ot = o.pos.y - oh;
-      const ob = o.pos.y;
-      if (m.r > ol && m.l < or && m.b > ot && m.t < ob) {
+      const cy = GROUND_Y - ob.cy();
+      if (
+        !god &&
+        m.r > ob.obj.pos.x - ob.hw &&
+        m.l < ob.obj.pos.x + ob.hw &&
+        m.b > cy - ob.hh &&
+        m.t < cy + ob.hh
+      ) {
         alive = false;
         deadAt = k.time();
         man.angle = -14;
+        man.scale = k.vec2(1, 1);
         sfx.die();
         cb.onGameOver?.(lastScore);
         break;
@@ -378,9 +613,18 @@ export async function startDinoGame(
     }
   });
 
-  return () => {
+  let stopped = false;
+  const stop = () => {
+    if (stopped) return;
+    stopped = true;
+    locked = true;
     window.removeEventListener("keydown", onKeyDown, true);
     document.removeEventListener("keydown", onKeyDown, true);
+    window.removeEventListener("keyup", onKeyUp, true);
+    canvas.removeEventListener("touchstart", onTouchStart);
+    canvas.removeEventListener("touchmove", onTouchMove);
+    canvas.removeEventListener("touchend", onTouchEnd);
+    canvas.removeEventListener("touchcancel", onTouchEnd);
     try {
       void ac?.close();
     } catch {
@@ -391,5 +635,17 @@ export async function startDinoGame(
     } catch {
       /* ya estaba cerrado */
     }
+  };
+
+  return {
+    stop,
+    restart: () => {
+      if (!alive) restart();
+    },
+    setLocked: (v: boolean) => {
+      locked = v;
+      if (v) ducking = false;
+    },
+    isAlive: () => alive,
   };
 }
