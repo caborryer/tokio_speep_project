@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import styles from "./DinoLoader.module.css";
 import { startDinoGame, type DinoControls } from "./dinoGame";
@@ -30,9 +31,19 @@ type Props = {
   minDuration?: number;
   /** Modo prelanzamiento: el juego queda como pantalla permanente (no hay barra ni cierre). */
   persistent?: boolean;
+  /** Texto bajo el título en modo persistente (por defecto "PRÓXIMAMENTE"). */
+  label?: string;
+  /** Si se indica, muestra un botón "VOLVER" que lleva a esa ruta (para la página /juego). */
+  backHref?: string;
 };
 
-export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000, persistent = false }: Props) {
+export default function DinoLoader({
+  assets = DEFAULT_ASSETS,
+  minDuration = 7000,
+  persistent = false,
+  label = "PRÓXIMAMENTE",
+  backHref,
+}: Props) {
   const [phase, setPhase] = useState<"loading" | "leaving" | "done">(
     !persistent && hasShown ? "done" : "loading",
   );
@@ -122,11 +133,12 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
       onGameOver: (s) => {
         msgRef.current?.classList.add(styles.show);
         if (persistent) {
-          // Si no reinicia enseguida, se abre el panel para guardar el puntaje / ver el ranking
+          // El panel se abre ANTES de que el juego acepte reiniciar (0,45 s), así nadie se lo salta
+          // con un toque / espacio seguido; el juego queda pausado hasta que se pulse "Jugar de nuevo".
           clearTimeout(panelTimer.current);
           panelTimer.current = setTimeout(() => {
             if (controlsRef.current && !controlsRef.current.isAlive()) openPanel(s);
-          }, 900);
+          }, 350);
         }
         if (s > bestRef.current) {
           bestRef.current = s;
@@ -257,6 +269,11 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
           RANKING
         </button>
       )}
+      {persistent && backHref && (
+        <Link href={backHref} className={styles.backBtn}>
+          ← VOLVER
+        </Link>
+      )}
 
       <div className={styles.hud} aria-hidden="true">
         <span className={styles.hi} ref={hiRef}>HI 00000</span>
@@ -277,7 +294,7 @@ export default function DinoLoader({ assets = DEFAULT_ASSETS, minDuration = 7000
 
         <div className={styles.progressRow}>
           {persistent ? (
-            <span ref={labelRef}>PRÓXIMAMENTE</span>
+            <span ref={labelRef}>{label}</span>
           ) : (
             <>
               <div className={styles.bar}>

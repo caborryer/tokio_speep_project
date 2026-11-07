@@ -31,7 +31,7 @@ export default function ManuPage() {
       }}
       stats={{
         km: { icon: "cactus", value: "42" },
-        temp: { icon: "arma", value: "32" },
+        temp: { icon: "arma" },
         goal: { icon: "cerezas" },
       }}
     >

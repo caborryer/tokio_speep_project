@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import DinoLoader from "@/components/DinoLoader";
+import SiteNav from "@/components/SiteNav";
+import DraggableHead from "@/components/scene/DraggableHead";
 import FitStage from "@/components/FitStage";
 import Icon from "@/components/scene/Icon";
 import { PRELAUNCH } from "@/lib/siteConfig";
@@ -32,7 +33,7 @@ const HOME_ASSETS = [
 
 const COPY = [
   "Primer colombiano en completar",
-  "THE SPEED PROJECT.",
+  "THE SPEED PROJECT Solo.",
 ];
 
 function Pic({ src, w, h, className = "", priority }: { src: string; w: number; h: number; className?: string; priority?: boolean }) {
@@ -60,15 +61,7 @@ export default function Home() {
 
         <FitStage className={styles.fit}>
         <div className={styles.stage}>
-          <nav className={styles.nav} aria-label="Principal">
-            <Link href="/" className={styles.tag}>Inicio</Link>
-            <Link href="/reto" className={styles.tag}>El Reto</Link>
-            <Link href="/dona" className={styles.tag}>Dona un km</Link>
-            <Link href="/manu" className={styles.tag}>Manu</Link>
-            <Link href="/marcas" className={styles.tag}>Marcas</Link>
-            <Link href="/road-to-500" className={styles.tag}>Road to 500</Link>
-          </nav>
-          <Link href="/dona" className={`${styles.tag} ${styles.donate}`}>Dona ahora</Link>
+          <SiteNav />
 
           <div className={styles.hero}>
             <div className={`${styles.abs} ${styles.estrella}`}>
@@ -96,13 +89,13 @@ export default function Home() {
           </p>
 
           <div className={styles.mapWrap}>
-            <div className={styles.map} aria-hidden="true">
+            <div className={styles.map} data-route-map>
               <div className={styles.mRoute}><Pic src="/home/linea-punteada.svg" w={1394} h={206} className={styles.line} /></div>
               <div className={styles.mSanta}><Pic src="/home/santa-monica.svg" w={1037} h={457} className={styles.line} /></div>
               <div className={styles.mCity}><Pic src="/home/city.svg" w={1390} h={426} className={styles.line} /></div>
               <div className={styles.mDeath}><Pic src="/home/death-valley.svg" w={1140} h={646} className={styles.line} /></div>
               <div className={styles.mVegas}><Pic src="/home/las-vegas.svg" w={680} h={672} className={styles.line} /></div>
-              <div className={styles.mHead}><Icon name="manu-pixel" className={styles.img} /></div>
+              <DraggableHead className={styles.mHead}><Icon name="manu-pixel" className={styles.img} /></DraggableHead>
               <div className={styles.mStart}><Icon name="start" className={styles.img} /></div>
               <div className={styles.mBubble}><Pic src="/home/logo.webp" w={450} h={450} /></div>
               <div className={styles.mStar}><Pic src="/home/estrella-mapa.svg" w={347} h={331} /></div>

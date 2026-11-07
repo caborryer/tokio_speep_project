@@ -19,21 +19,32 @@ const RETO_COPY = [
  *  - URL de "embed" de YouTube / Vimeo (https://www.youtube.com/embed/ID).
  * Mientras esté vacío se muestra el recuadro con el botón de play.
  */
-const VIDEO_URL: string = "https://www.youtube.com/watch?v=egdad1czyDo";
+const VIDEO_URL: string = "https://player.vimeo.com/video/1244403680?h=60adc55656&title=0&byline=0&portrait=0&dnt=1";
+
+/**
+ * Enlace al video original (se muestra como etiqueta bajo el recuadro y se abre en una pestaña nueva).
+ * El recuadro reproduce VIDEO_URL dentro de la página. Déjalo vacío ("") para ocultar la etiqueta.
+ */
+const VIDEO_LINK: string = "https://www.youtube.com/watch?v=egdad1czyDo&t=10s";
 
 /** Convierte enlaces normales de YouTube / Vimeo (watch, youtu.be, shorts) a su versión "embed". */
 function toEmbed(url: string): string {
   try {
     const u = new URL(url);
     const host = u.hostname.replace(/^www\./, "");
-    if (host === "youtu.be") return `https://www.youtube.com/embed/${u.pathname.slice(1)}`;
+    // Segundo de inicio: ?t=10s, ?t=10, ?t=1m30s o ?start=10
+    const t = u.searchParams.get("t") ?? u.searchParams.get("start") ?? "";
+    const tm = t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/);
+    const startSec = tm ? Number(tm[1] ?? 0) * 3600 + Number(tm[2] ?? 0) * 60 + Number(tm[3] ?? 0) : 0;
+    const withStart = (embed: string) => (startSec > 0 ? `${embed}?start=${startSec}` : embed);
+    if (host === "youtu.be") return withStart(`https://www.youtube.com/embed/${u.pathname.slice(1)}`);
     if (host === "youtube.com" || host === "m.youtube.com") {
       if (u.pathname === "/watch") {
         const id = u.searchParams.get("v");
-        if (id) return `https://www.youtube.com/embed/${id}`;
+        if (id) return withStart(`https://www.youtube.com/embed/${id}`);
       }
       const m = u.pathname.match(/^\/(shorts|live)\/([\w-]+)/);
-      if (m) return `https://www.youtube.com/embed/${m[2]}`;
+      if (m) return withStart(`https://www.youtube.com/embed/${m[2]}`);
     }
     if (host === "vimeo.com") {
       const id = u.pathname.match(/^\/(\d+)/)?.[1];
@@ -60,7 +71,7 @@ export default function RetoPage() {
       }}
       stats={{
         km: { icon: "casa-playa", value: "0" },
-        temp: { icon: "ventilador", value: "10" },
+        temp: { icon: "ventilador" },
         goal: { icon: "ficha" },
       }}
     >
@@ -103,6 +114,16 @@ export default function RetoPage() {
             </button>
           )}
         </div>
+        {VIDEO_LINK && (
+          <a
+            className={`${v.yTag} ${v.videoLink}`}
+            href={VIDEO_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Ver original en YouTube ↗
+          </a>
+        )}
         <Image src="/scene/photos/cinta.webp" alt="" width={700} height={700} unoptimized priority className={v.tape1} />
         <Image src="/scene/photos/cinta.webp" alt="" width={700} height={700} unoptimized className={v.tape2} />
       </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import InfoPopup from "@/components/InfoPopup";
 import Icon from "@/components/scene/Icon";
 import { Lines } from "@/components/scene/Lorem";
 import Scene from "@/components/scene/Scene";
@@ -17,12 +18,16 @@ export const metadata: Metadata = {
 const DONE_KM = 250;
 const GOAL_KM = 500;
 
+/**
+ * Qué incluye cada pago (texto de ejemplo: reemplázalo por el real).
+ * Se muestra en el pop-up al hacer clic en la moneda.
+ */
 const TIERS = [
-  { usd: "$ 10", km: "0.1 Km" },
-  { usd: "$ 40", km: "0.5 Km" },
-  { usd: "$ 80", km: "1 Km" },
-  { usd: "$ 400", km: "5 Km" },
-  { usd: "$ 800", km: "10 Km" },
+  { usd: "$ 10", km: "0.1 Km", includes: ["0.1 km de la ruta de Manu", "Tu nombre en el muro de donantes"] },
+  { usd: "$ 40", km: "0.5 Km", includes: ["0.5 km de la ruta de Manu", "Tu nombre en el muro de donantes", "Sticker oficial del reto"] },
+  { usd: "$ 80", km: "1 Km", includes: ["1 km de la ruta de Manu", "Tu nombre en el muro de donantes", "Sticker oficial del reto", "Mención en las redes de Manu"] },
+  { usd: "$ 400", km: "5 Km", includes: ["5 km de la ruta de Manu", "Tu nombre en el muro de donantes", "Camiseta oficial del reto", "Póster firmado por Manu"] },
+  { usd: "$ 800", km: "10 Km", includes: ["10 km de la ruta de Manu", "Tu nombre en el muro de donantes", "Camiseta y póster firmados", "Tu marca o nombre en el vehículo de apoyo"] },
 ];
 const ROW_Y = [226, 305, 388, 469, 557];
 
@@ -34,7 +39,7 @@ export default function DonaPage() {
       map={{ star: { l: 720, t: 845 }, bubble: { l: 677, t: 706, w: 151 } }}
       stats={{
         km: { icon: "semaforo", value: "15" },
-        temp: { icon: "helado", value: "18" },
+        temp: { icon: "helado" },
         goal: { icon: "carta" },
       }}
     >
@@ -69,7 +74,18 @@ export default function DonaPage() {
         <ul className={v.coins}>
           {TIERS.map((t, i) => (
             <li key={t.usd} className={v.coin} style={{ "--y": ROW_Y[i] - 188 } as React.CSSProperties}>
-              <Icon name="moneda" className={v.coinImg} />
+              <InfoPopup
+                trigger={<Icon name="moneda" className={v.coinImg} />}
+                triggerLabel={`Ver qué incluye el pago de ${t.usd}`}
+                title={`Qué incluye ${t.usd}`}
+                subtitle={`Equivale a ${t.km} de la ruta`}
+              >
+                <ul>
+                  {t.includes.map((x) => (
+                    <li key={x}>{x}</li>
+                  ))}
+                </ul>
+              </InfoPopup>
               <span className={`${v.yTag} ${v.price}`}>{t.usd}</span>
               <span className={v.coinKm}>{t.km}</span>
             </li>

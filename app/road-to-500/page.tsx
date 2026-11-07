@@ -75,7 +75,7 @@ export default function RoadTo500Page() {
       map={null}
       stats={{
         km: { icon: "lasvegas", value: "500" },
-        temp: { icon: "luna", value: "25" },
+        temp: { icon: "luna" },
         goal: { icon: "dado" },
       }}
     >

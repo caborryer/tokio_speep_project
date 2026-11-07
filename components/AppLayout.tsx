@@ -9,7 +9,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   // Las vistas del rediseño traen su propia navegación (etiquetas amarillas): ocultamos el header global ahí.
   const pathname = usePathname();
-  const isHome = ['/', '/dona', '/manu', '/marcas', '/road-to-500', '/reto'].includes(pathname);
+  const isHome = ['/', '/dona', '/manu', '/marcas', '/road-to-500', '/reto', '/tienda', '/aliados', '/juego'].includes(pathname);
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -60,7 +60,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             padding: '0.5rem 1.5rem',
             textTransform: 'uppercase'
           }}>
-            DONA AHORA
+            COMPRA AHORA
           </Link>
         </nav>
       </header>
@@ -96,7 +96,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             textAlign: 'center',
             marginTop: '1rem'
           }}>
-            DONA AHORA
+            COMPRA AHORA
           </Link>
         </nav>
       )}

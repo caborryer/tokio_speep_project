@@ -1,0 +1,19 @@
+/* La cabeza de Manu arrastrable por la ruta */
+.head {
+  cursor: grab;
+  touch-action: none; /* el dedo arrastra la cabeza, no la página */
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 3; /* por encima de la estrella y el logo, para poder agarrarla en cualquier punto */
+}
+.dragging {
+  cursor: grabbing;
+}
+.head:focus-visible {
+  outline: 3px solid #ede864;
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+.head img {
+  pointer-events: none; /* el arrastre lo recibe el contenedor, no la imagen */
+}

@@ -142,52 +142,6 @@
 }
 
 /* Etiquetas amarillas (nav + botones) */
-.tag {
-  display: inline-block;
-  background: var(--yellow);
-  color: #000;
-  font-weight: 700;
-  text-transform: uppercase;
-  text-decoration: none;
-  line-height: 1.05;
-  white-space: nowrap;
-  transition: transform 0.15s ease;
-}
-.tag:hover {
-  transform: rotate(0deg) scale(1.05) !important;
-}
-
-.nav {
-  position: absolute;
-  left: calc(var(--u) * 48);
-  top: calc(var(--u) * 72);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: calc(var(--u) * 15);
-  z-index: 5;
-}
-.nav .tag {
-  font-size: calc(var(--u) * 27);
-  padding: calc(var(--u) * 5) calc(var(--u) * 8);
-}
-.nav .tag:nth-child(1) { transform: rotate(-0.5deg); }
-.nav .tag:nth-child(2) { transform: rotate(0.4deg); }
-.nav .tag:nth-child(3) { transform: rotate(0.9deg); }
-.nav .tag:nth-child(4) { transform: rotate(1.8deg); margin-left: calc(var(--u) * 3); padding-right: calc(var(--u) * 22); }
-.nav .tag:nth-child(5) { transform: rotate(0.8deg); margin-left: calc(var(--u) * 4); }
-.nav .tag:nth-child(6) { transform: rotate(-0.6deg); margin-left: calc(var(--u) * 2); }
-
-.donate {
-  position: absolute;
-  right: calc(var(--u) * 70);
-  top: calc(var(--u) * 52);
-  font-size: calc(var(--u) * 30);
-  padding: calc(var(--u) * 14) calc(var(--u) * 20);
-  transform: rotate(-1deg);
-  z-index: 5;
-}
-
 /* ---------- Mapa del recorrido (1700 x 430, origen en 110, 635) ---------- */
 .map {
   position: absolute;
@@ -297,28 +251,6 @@
     align-items: stretch;
     padding: 18px 0 44px;
     gap: 22px;
-  }
-
-  .nav {
-    position: static;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 0 16px;
-    padding-right: 150px; /* deja espacio al botón Dona ahora */
-  }
-  .nav .tag,
-  .nav .tag:nth-child(n) {
-    font-size: clamp(13px, 4vw, 17px);
-    padding: 4px 8px;
-    margin: 0;
-  }
-  .donate {
-    position: absolute;
-    right: 16px;
-    top: 18px;
-    font-size: clamp(13px, 4vw, 17px);
-    padding: 8px 12px;
   }
 
   .mapWrap {

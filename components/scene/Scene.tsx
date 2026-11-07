@@ -1,8 +1,10 @@
-import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import Icon from "./Icon";
 import FitStage from "../FitStage";
+import SiteNav from "../SiteNav";
+import LiveTemp from "./LiveTemp";
+import DraggableHead from "./DraggableHead";
 import type { IconName } from "@/lib/sceneIcons";
 import styles from "./Scene.module.css";
 
@@ -23,14 +25,16 @@ export type MapConfig = {
 
 export type StatsConfig = {
   km: { icon: IconName; value: string };
-  temp: { icon: IconName; value: string };
+  /** La temperatura es en vivo (Santa Monica): no lleva valor. */
+  temp: { icon: IconName };
   goal: { icon: IconName };
 };
 
 type Props = {
   bg: SceneBg;
   map?: MapConfig | null;
-  stats: StatsConfig;
+  /** Datos de km / temperatura / meta (abajo a la derecha). Omitir `stats` los oculta. */
+  stats?: StatsConfig | null;
   children?: ReactNode;
 };
 
@@ -48,7 +52,7 @@ function Pic({ src, w, h, className = "" }: { src: string; w: number; h: number;
 }
 
 /**
- * Estructura común de las vistas: fondo, navegación (etiquetas amarillas), botón "Dona ahora",
+ * Estructura común de las vistas: fondo, navegación (etiquetas amarillas), botón "Compra ahora",
  * mapa del recorrido y datos (km / temperatura / meta). El contenido propio de cada vista va en `children`.
  */
 export default function Scene({ bg, map, stats, children }: Props) {
@@ -64,21 +68,13 @@ export default function Scene({ bg, map, stats, children }: Props) {
 
       <FitStage className={styles.fit}>
       <div className={styles.stage}>
-        <nav className={styles.nav} aria-label="Principal">
-          <Link href="/" className={styles.tag}>Inicio</Link>
-          <Link href="/reto" className={styles.tag}>El Reto</Link>
-          <Link href="/dona" className={styles.tag}>Dona un km</Link>
-          <Link href="/manu" className={styles.tag}>Manu</Link>
-          <Link href="/marcas" className={styles.tag}>Marcas</Link>
-          <Link href="/road-to-500" className={styles.tag}>Road to 500</Link>
-        </nav>
-        <Link href="/dona" className={`${styles.tag} ${styles.donate}`}>Dona ahora</Link>
+        <SiteNav />
 
         {children}
 
         {map && (
           <div className={styles.mapWrap}>
-            <div className={styles.map} aria-hidden="true">
+            <div className={styles.map} data-route-map>
               <div className={styles.mRoute}><Pic src="/home/linea-punteada.svg" w={1394} h={206} className={styles.line} /></div>
               <div className={styles.mSanta}><Pic src="/home/santa-monica.svg" w={1037} h={457} className={styles.line} /></div>
               <div className={styles.mCity}><Pic src="/home/city.svg" w={1390} h={426} className={styles.line} /></div>
@@ -89,7 +85,7 @@ export default function Scene({ bg, map, stats, children }: Props) {
                 <div className={styles.mStart}><Icon name="start" className={styles.img} /></div>
               )}
               {map.head && (
-                <div className={styles.mHead} style={at(map.head)}><Icon name="manu-pixel" className={styles.img} /></div>
+                <DraggableHead className={styles.mHead} style={at(map.head)}><Icon name="manu-pixel" className={styles.img} /></DraggableHead>
               )}
               {map.bubble && (
                 <div className={styles.mBubble} style={at(map.bubble)}>
@@ -103,20 +99,22 @@ export default function Scene({ bg, map, stats, children }: Props) {
           </div>
         )}
 
-        <div className={styles.stats}>
-          <div className={`${styles.sIcon} ${styles.sI1}`}><Icon name={stats.km.icon} className={styles.imgC} /></div>
-          <div className={`${styles.sTxt} ${styles.sT1}`}>
-            <span className={styles.big}>{stats.km.value}</span>
-            <br />Km
+        {stats && (
+          <div className={styles.stats}>
+            <div className={`${styles.sIcon} ${styles.sI1}`}><Icon name={stats.km.icon} className={styles.imgC} /></div>
+            <div className={`${styles.sTxt} ${styles.sT1}`}>
+              <span className={styles.big}>{stats.km.value}</span>
+              <br />Km
+            </div>
+            <div className={`${styles.sIcon} ${styles.sI2}`}><Icon name={stats.temp.icon} className={styles.imgC} /></div>
+            <div className={`${styles.sTxt} ${styles.sT2}`}>
+              <span className={styles.big}><LiveTemp /> (°C)</span>
+              <small>Temperatura</small>
+            </div>
+            <div className={`${styles.sIcon} ${styles.sI3}`}><Icon name={stats.goal.icon} className={styles.imgC} /></div>
+            <div className={`${styles.sTxt} ${styles.sT3}`}>La<br />Meta</div>
           </div>
-          <div className={`${styles.sIcon} ${styles.sI2}`}><Icon name={stats.temp.icon} className={styles.imgC} /></div>
-          <div className={`${styles.sTxt} ${styles.sT2}`}>
-            <span className={styles.big}>{stats.temp.value} (°C)</span>
-            <small>Temperatura</small>
-          </div>
-          <div className={`${styles.sIcon} ${styles.sI3}`}><Icon name={stats.goal.icon} className={styles.imgC} /></div>
-          <div className={`${styles.sTxt} ${styles.sT3}`}>La<br />Meta</div>
-        </div>
+        )}
       </div>
       </FitStage>
     </div>

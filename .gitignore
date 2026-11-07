@@ -50,3 +50,7 @@ openspec
 # playwright
 /test-results/
 /playwright-report/
+
+# videos sueltos en la raíz (no subir al repositorio)
+/VIDEO-*.mp4
+/.next-*/

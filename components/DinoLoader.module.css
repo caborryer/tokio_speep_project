@@ -222,6 +222,25 @@
   border: 0;
   cursor: pointer;
 }
+.backBtn {
+  position: absolute;
+  top: calc(clamp(14px, 3vh, 34px) + 3.4em);
+  left: clamp(14px, 4vw, 70px);
+  z-index: 12; /* por encima del panel de fin de partida: siempre se puede salir */
+  padding: 0.7em 1em;
+  font-family: 'Press Start 2P', var(--font-mono, monospace), monospace;
+  font-size: clamp(9px, 1.3vw, 13px);
+  letter-spacing: 1px;
+  color: #ffe600;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #ffe600;
+  text-decoration: none;
+}
+.backBtn:hover {
+  background: #ffe600;
+  color: #000;
+}
+
 .rankBtn:hover,
 .btn:hover {
   background: #fff;

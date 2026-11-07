@@ -56,7 +56,7 @@ export default function MarcasPage() {
       map={{ star: { l: 1546, t: 872 }, head: { l: 1325, t: 778, w: 90 }, bubble: { l: 1525, t: 765, w: 103 } }}
       stats={{
         km: { icon: "camioneta", value: "320" },
-        temp: { icon: "chile", value: "50" },
+        temp: { icon: "chile" },
         goal: { icon: "seven" },
       }}
     >

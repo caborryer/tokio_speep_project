@@ -1,0 +1,75 @@
+/* Menú principal (etiquetas amarillas) + botón "Compra ahora". Lo comparten la home y todas las vistas. */
+
+.tag {
+  display: inline-block;
+  background: var(--yellow, #ede864);
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  line-height: 1.05;
+  white-space: nowrap;
+  transition: transform 0.15s ease;
+}
+.tag:hover {
+  transform: rotate(0deg) scale(1.05) !important;
+}
+
+.nav {
+  position: absolute;
+  left: calc(var(--u) * 48);
+  top: calc(var(--u) * 72);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--u) * 9);
+  z-index: 5;
+}
+.nav .tag {
+  font-size: calc(var(--u) * 27);
+  padding: calc(var(--u) * 5) calc(var(--u) * 8);
+}
+.nav .tag:nth-child(1) { transform: rotate(-0.5deg); }
+.nav .tag:nth-child(2) { transform: rotate(0.4deg); }
+.nav .tag:nth-child(3) { transform: rotate(0.9deg); }
+.nav .tag:nth-child(4) { transform: rotate(1.8deg); margin-left: calc(var(--u) * 3); padding-right: calc(var(--u) * 22); }
+.nav .tag:nth-child(5) { transform: rotate(0.8deg); margin-left: calc(var(--u) * 4); }
+.nav .tag:nth-child(6) { transform: rotate(-0.6deg); margin-left: calc(var(--u) * 2); }
+.nav .tag:nth-child(7) { transform: rotate(0.5deg); margin-left: calc(var(--u) * 3); }
+.nav .tag:nth-child(8) { transform: rotate(-0.9deg); margin-left: calc(var(--u) * 1); }
+.nav .tag:nth-child(9) { transform: rotate(0.7deg); margin-left: calc(var(--u) * 4); }
+
+.cta {
+  position: absolute;
+  right: calc(var(--u) * 70);
+  top: calc(var(--u) * 52);
+  font-size: calc(var(--u) * 30);
+  padding: calc(var(--u) * 14) calc(var(--u) * 20);
+  transform: rotate(-1deg);
+  z-index: 5;
+}
+
+/* Móvil / tablet vertical (mismo criterio que las vistas) */
+@container (max-width: 899px) and (max-aspect-ratio: 1/1) {
+  .nav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 16px;
+    padding-right: 150px; /* deja espacio al botón Compra ahora */
+  }
+  .nav .tag,
+  .nav .tag:nth-child(n) {
+    font-size: clamp(13px, 4vw, 17px);
+    padding: 4px 8px;
+    margin: 0;
+  }
+  .cta {
+    position: absolute;
+    right: 16px;
+    top: 18px;
+    font-size: clamp(13px, 4vw, 17px);
+    padding: 8px 12px;
+  }
+}
