@@ -26,7 +26,10 @@ export type DinoControls = {
   isAlive: () => boolean;
 };
 
-type ObstacleKind = "cactus1" | "cactus2" | "cactusBig" | "cactusTriple" | "rock" | "weed" | "birdLow" | "birdHigh";
+type ObstacleKind =
+  | "cactus1" | "cactus2" | "cactusBig" | "cactusTriple" | "rock" | "weed" | "birdLow" | "birdHigh"
+  // Del desierto a Las Vegas
+  | "bear" | "bearStand" | "dice" | "chips" | "slot" | "card";
 
 /** Cuerpo de colisión de un obstáculo (centro-abajo en px, relativo al suelo). */
 type Obstacle = {
@@ -110,6 +113,7 @@ export async function startDinoGame(
   const qs = DEV ? new URLSearchParams(window.location.search) : null;
   const dbgStart = Number(qs?.get("dbg") ?? 0) * 25;
   const god = DEV && qs?.get("god") === "1";
+  const onlyKinds = (DEV ? qs?.get("kinds")?.split(",") : null) as ObstacleKind[] | null; // ?kinds=bear,slot fuerza esos obstáculos
 
   // ---------- Estado ----------
   let speed = START_SPEED;
@@ -126,6 +130,10 @@ export async function startDinoGame(
   let ducking = false;
   let locked = false;
   let obstacles: Obstacle[] = [];
+  let shield = false; // ficha de la suerte: absorbe un choque
+  let invuln = 0; // segundos de invulnerabilidad tras romper el escudo
+  let pickups: { obj: { pos: { x: number; y: number }; destroy: () => void }; cy: number }[] = [];
+  let signIn = 1000; // próximo cartel "Las Vegas" (en puntos)
 
   // ---------- Fondo: desierto (estático, como en la referencia) ----------
   k.add([
@@ -134,6 +142,55 @@ export async function startDinoGame(
     k.anchor("bot"),
     k.opacity(0.8),
     k.z(0),
+  ]);
+
+  // ---------- Skyline de Las Vegas (aparece poco a poco al avanzar) ----------
+  const INK_BG = k.rgb(5, 5, 5);
+  const SKY_W = W * 1.6;
+  const WIN = k.rgb(255, 255, 255);
+  type Bld = { x: number; w: number; h: number; kind: "box" | "tower" | "pyramid" | "sphere" | "eiffel" };
+  const skyline: Bld[] = [
+    { x: 0.04, w: 54, h: 70, kind: "box" },
+    { x: 0.14, w: 16, h: 150, kind: "tower" }, // Stratosphere
+    { x: 0.24, w: 96, h: 70, kind: "pyramid" }, // Luxor
+    { x: 0.38, w: 60, h: 96, kind: "box" },
+    { x: 0.5, w: 72, h: 72, kind: "sphere" }, // The Sphere
+    { x: 0.62, w: 46, h: 112, kind: "box" },
+    { x: 0.72, w: 44, h: 104, kind: "eiffel" }, // Paris
+    { x: 0.86, w: 64, h: 66, kind: "box" },
+  ];
+  let skyScroll = 0;
+  k.add([
+    k.pos(0, 0),
+    k.z(0.5),
+    {
+      draw() {
+        const sc = Math.max(0, lastScore);
+        const op = Math.min(0.38, Math.max(0, (sc - 400) / 300) * 0.38);
+        if (op <= 0) return;
+        for (const b of skyline) {
+          const x = (((b.x * SKY_W - skyScroll) % SKY_W) + SKY_W) % SKY_W - 120;
+          const base = GROUND_Y;
+          if (b.kind === "tower") {
+            k.drawRect({ pos: k.vec2(x + b.w / 2 - 3, base - b.h), width: 6, height: b.h, color: WIN, opacity: op });
+            k.drawEllipse({ pos: k.vec2(x + b.w / 2, base - b.h + 30), radiusX: 20, radiusY: 7, color: WIN, opacity: op });
+          } else if (b.kind === "pyramid") {
+            k.drawPolygon({ pts: [k.vec2(x, base), k.vec2(x + b.w / 2, base - b.h), k.vec2(x + b.w, base)], color: WIN, opacity: op });
+          } else if (b.kind === "sphere") {
+            k.drawCircle({ pos: k.vec2(x + b.w / 2, base - b.h / 2), radius: b.h / 2, color: WIN, opacity: op });
+          } else if (b.kind === "eiffel") {
+            k.drawPolygon({ pts: [k.vec2(x, base), k.vec2(x + b.w / 2 - 3, base - b.h), k.vec2(x + b.w / 2 + 3, base - b.h), k.vec2(x + b.w, base)], color: WIN, opacity: op });
+          } else {
+            k.drawRect({ pos: k.vec2(x, base - b.h), width: b.w, height: b.h, color: WIN, opacity: op });
+            for (let wy = base - b.h + 8; wy < base - 8; wy += 14) {
+              for (let wx = x + 7; wx < x + b.w - 7; wx += 12) {
+                k.drawRect({ pos: k.vec2(wx, wy), width: 4, height: 6, color: INK_BG, opacity: op * 1.6 });
+              }
+            }
+          }
+        }
+      },
+    },
   ]);
 
   // ---------- Nubes ----------
@@ -306,6 +363,193 @@ export async function startDinoGame(
     });
   };
 
+  /** Oso: camina hacia Manuel (hay que saltarlo). */
+  const BEAR_REL = 1.12;
+  const addBear = (x: number) => {
+    let t = k.rand(0, 6);
+    const leg = (lx: number, ph: number) => {
+      const sw = Math.sin(t * 9 + ph) * 8;
+      k.drawRect({ pos: k.vec2(lx + sw - 4, -22), width: 9, height: 22, color: WHITE });
+    };
+    const o = k.add([
+      k.pos(x, GROUND_Y + 2),
+      k.z(3),
+      {
+        draw() {
+          leg(-22, 0);
+          leg(-10, Math.PI);
+          leg(14, Math.PI);
+          leg(26, 0);
+          k.drawEllipse({ pos: k.vec2(2, -40), radiusX: 36, radiusY: 21, color: WHITE }); // cuerpo
+          k.drawEllipse({ pos: k.vec2(14, -54), radiusX: 16, radiusY: 12, color: WHITE }); // joroba
+          k.drawCircle({ pos: k.vec2(-36, -47), radius: 14, color: WHITE }); // cabeza
+          k.drawCircle({ pos: k.vec2(-30, -60), radius: 5, color: WHITE }); // orejas
+          k.drawCircle({ pos: k.vec2(-43, -59), radius: 5, color: WHITE });
+          k.drawEllipse({ pos: k.vec2(-48, -43), radiusX: 9, radiusY: 6, color: WHITE }); // hocico
+          k.drawCircle({ pos: k.vec2(-52, -45), radius: 2.4, color: INK });
+          k.drawCircle({ pos: k.vec2(-37, -51), radius: 2, color: INK });
+          k.drawLines({ pts: [k.vec2(-12, -52), k.vec2(-4, -36), k.vec2(-10, -26)], width: 2, color: INK });
+        },
+      },
+      "obstacle",
+    ]);
+    obstacles.push({ obj: o, kind: "bear", rel: BEAR_REL, hw: 38, hh: 25, cy: () => 31, tick: (dt) => { t += dt; } });
+  };
+
+  /** Oso parado en dos patas: alto, hay que saltarlo con buen tiempo. */
+  const addBearStand = (x: number) => {
+    let t = k.rand(0, 6);
+    const o = k.add([
+      k.pos(x, GROUND_Y + 2),
+      k.z(3),
+      {
+        draw() {
+          const sway = Math.sin(t * 4) * 3;
+          k.drawRect({ pos: k.vec2(-18, -28), width: 14, height: 28, color: WHITE }); // patas
+          k.drawRect({ pos: k.vec2(4, -28), width: 14, height: 28, color: WHITE });
+          k.drawEllipse({ pos: k.vec2(0, -64), radiusX: 26, radiusY: 38, color: WHITE }); // torso
+          k.drawLines({ pts: [k.vec2(-22, -80), k.vec2(-40 + sway, -62), k.vec2(-48 + sway, -86)], width: 9, color: WHITE }); // brazos arriba
+          k.drawLines({ pts: [k.vec2(22, -80), k.vec2(40 - sway, -62), k.vec2(48 - sway, -86)], width: 9, color: WHITE });
+          k.drawCircle({ pos: k.vec2(0, -108), radius: 17, color: WHITE }); // cabeza
+          k.drawCircle({ pos: k.vec2(-13, -122), radius: 6, color: WHITE });
+          k.drawCircle({ pos: k.vec2(13, -122), radius: 6, color: WHITE });
+          k.drawEllipse({ pos: k.vec2(0, -102), radiusX: 9, radiusY: 6, color: INK }); // hocico oscuro
+          k.drawCircle({ pos: k.vec2(-6, -112), radius: 2, color: INK });
+          k.drawCircle({ pos: k.vec2(6, -112), radius: 2, color: INK });
+        },
+      },
+      "obstacle",
+    ]);
+    obstacles.push({ obj: o, kind: "bearStand", rel: 1.05, hw: 24, hh: 58, cy: () => 60, tick: (dt) => { t += dt; } });
+  };
+
+  /** Dado que rueda y rebota. */
+  const DICE_REL = 1.2;
+  const addDice = (x: number) => {
+    const half = 17;
+    let ang = 0;
+    let bt = k.rand(0, 6);
+    const pips: [number, number][] = [[-8, -8], [8, -8], [0, 0], [-8, 8], [8, 8]];
+    const o = k.add([
+      k.pos(x, GROUND_Y - half),
+      k.z(3),
+      {
+        draw() {
+          k.pushTransform();
+          k.pushRotate(ang);
+          k.drawRect({ pos: k.vec2(-half, -half), width: half * 2, height: half * 2, radius: 5, color: WHITE });
+          for (const [px, py] of pips) k.drawCircle({ pos: k.vec2(px, py), radius: 3.2, color: INK });
+          k.popTransform();
+        },
+      },
+      "obstacle",
+    ]);
+    obstacles.push({
+      obj: o,
+      kind: "dice",
+      rel: DICE_REL,
+      hw: 16,
+      hh: 16,
+      cy: () => GROUND_Y - o.pos.y,
+      tick: (dt, sp) => {
+        bt += dt * 4.5;
+        o.pos.y = GROUND_Y - half - Math.abs(Math.sin(bt)) * 22;
+        ang += ((sp * DICE_REL * dt) / half) * 40;
+      },
+    });
+  };
+
+  /** Torre de fichas de casino. */
+  const addChips = (x: number) => {
+    const o = k.add([
+      k.pos(x, GROUND_Y + 2),
+      k.z(3),
+      {
+        draw() {
+          for (let i = 0; i < 5; i++) {
+            const y = -6 - i * 11;
+            k.drawEllipse({ pos: k.vec2(0, y + 4), radiusX: 27, radiusY: 8, color: WHITE });
+            k.drawRect({ pos: k.vec2(-27, y - 4), width: 54, height: 8, color: WHITE });
+            k.drawEllipse({ pos: k.vec2(0, y - 4), radiusX: 27, radiusY: 8, color: WHITE });
+            for (let j = -2; j <= 2; j++) k.drawRect({ pos: k.vec2(j * 10 - 2, y - 2), width: 4, height: 6, color: INK });
+          }
+        },
+      },
+      "obstacle",
+    ]);
+    obstacles.push({ obj: o, kind: "chips", rel: 1, hw: 27, hh: 30, cy: () => 31 });
+  };
+
+  /** Tragamonedas: alta y ancha. */
+  const addSlot = (x: number) => {
+    let t = k.rand(0, 6);
+    const o = k.add([
+      k.pos(x, GROUND_Y + 2),
+      k.z(3),
+      {
+        draw() {
+          k.drawRect({ pos: k.vec2(-28, -96), width: 56, height: 96, radius: 6, color: WHITE });
+          k.drawRect({ pos: k.vec2(-21, -84), width: 42, height: 26, color: INK });
+          const sym = Math.floor(t * 6) % 3 === 0 ? ["7", "7", "7"] : ["7", "$", "7"];
+          for (let i = 0; i < 3; i++) k.drawText({ text: sym[i], size: 16, pos: k.vec2(-14 + i * 14, -71), anchor: "center", color: WHITE });
+          k.drawRect({ pos: k.vec2(-21, -50), width: 42, height: 8, color: INK });
+          k.drawRect({ pos: k.vec2(-14, -30), width: 28, height: 22, color: INK });
+          k.drawLines({ pts: [k.vec2(28, -70), k.vec2(40, -82)], width: 4, color: WHITE }); // palanca
+          k.drawCircle({ pos: k.vec2(41, -84), radius: 6, color: WHITE });
+        },
+      },
+      "obstacle",
+    ]);
+    obstacles.push({ obj: o, kind: "slot", rel: 1, hw: 30, hh: 48, cy: () => 48, tick: (dt) => { t += dt; } });
+  };
+
+  /** Carta voladora (alta: agáchate o salta). */
+  const addCard = (x: number) => {
+    let t = k.rand(0, 3);
+    const o = k.add([
+      k.pos(x, GROUND_Y - 94),
+      k.z(3),
+      {
+        draw() {
+          const sx = Math.max(0.15, Math.abs(Math.cos(t * 5)));
+          k.pushTransform();
+          k.pushScale(sx, 1);
+          k.drawRect({ pos: k.vec2(-14, -20), width: 28, height: 40, radius: 4, color: WHITE });
+          k.drawText({ text: "A", size: 18, pos: k.vec2(0, -4), anchor: "center", color: INK });
+          k.drawCircle({ pos: k.vec2(0, 11), radius: 3.5, color: INK });
+          k.popTransform();
+        },
+      },
+      "obstacle",
+    ]);
+    obstacles.push({ obj: o, kind: "card", rel: 1.1, hw: 14, hh: 18, cy: () => 94, tick: (dt) => { t += dt; } });
+  };
+
+  /** Ficha dorada de la suerte: si la agarras, el siguiente choque no cuenta. */
+  const addPickup = (x: number) => {
+    const cy = k.rand(86, 118);
+    let t = 0;
+    const o = k.add([
+      k.pos(x, GROUND_Y - cy),
+      k.z(4),
+      {
+        draw() {
+          const r = 15 + Math.sin(t * 6) * 1.2;
+          const GOLD = k.rgb(237, 232, 100);
+          k.drawCircle({ radius: r + 4, color: GOLD, opacity: 0.22 });
+          k.drawCircle({ radius: r, color: GOLD });
+          k.drawCircle({ radius: r - 4, fill: false, outline: { width: 2, color: INK } });
+          k.drawText({ text: "$", size: 16, anchor: "center", pos: k.vec2(0, 1), color: INK });
+        },
+        update() {
+          t += k.dt();
+        },
+      },
+      "pickup",
+    ]);
+    pickups.push({ obj: o, cy });
+  };
+
   const spawn = (kind: ObstacleKind, x: number) => {
     switch (kind) {
       case "cactus1":
@@ -326,20 +570,38 @@ export async function startDinoGame(
         return addBird(x, 26);
       case "birdHigh":
         return addBird(x, 88);
+      case "bear":
+        return addBear(x);
+      case "bearStand":
+        return addBearStand(x);
+      case "dice":
+        return addDice(x);
+      case "chips":
+        return addChips(x);
+      case "slot":
+        return addSlot(x);
+      case "card":
+        return addCard(x);
     }
   };
 
   const REL: Record<ObstacleKind, number> = {
     cactus1: 1, cactus2: 1, cactusBig: 1, cactusTriple: 1, rock: 1, weed: WEED_REL, birdLow: BIRD_REL, birdHigh: BIRD_REL,
+    bear: BEAR_REL, bearStand: 1.05, dice: DICE_REL, chips: 1, slot: 1, card: 1.1,
   };
 
   /** Dificultad progresiva según el puntaje: va sumando obstáculos nuevos. */
   const pickKind = (): ObstacleKind => {
+    if (onlyKinds?.length) return onlyKinds[Math.floor(k.rand(0, onlyKinds.length))];
     const sc = Math.max(0, lastScore);
     const pool: [ObstacleKind, number][] = [["cactus1", 3], ["cactus2", 2]];
     if (sc >= 150) pool.push(["cactusTriple", 2], ["rock", 2], ["cactusBig", 1]);
+    if (sc >= 280) pool.push(["bear", 3]); // el desierto tiene osos
     if (sc >= 350) pool.push(["weed", 3]);
+    if (sc >= 450) pool.push(["dice", 2]); // ya huele a Las Vegas
     if (sc >= 600) pool.push(["birdLow", 2], ["birdHigh", 3]);
+    if (sc >= 800) pool.push(["chips", 2], ["slot", 2]);
+    if (sc >= 1000) pool.push(["bearStand", 2], ["card", 2]);
     const total = pool.reduce((a, [, w]) => a + w, 0);
     let r = k.rand(0, total);
     for (const [kind, w] of pool) {
@@ -393,6 +655,12 @@ export async function startDinoGame(
       tone(880, 0.08, 0.04);
       tone(1175, 0.14, 0.04, 0.09);
     },
+    pickup: () => {
+      tone(660, 0.08, 0.05);
+      tone(990, 0.1, 0.05, 0.07);
+      tone(1320, 0.16, 0.05, 0.14);
+    },
+    shieldBreak: () => tone(500, 0.25, 0.06, 0, 120),
     die: () => {
       tone(320, 0.12, 0.06, 0, 160);
       tone(150, 0.3, 0.06, 0.13, 60);
@@ -461,7 +729,14 @@ export async function startDinoGame(
 
   const restart = () => {
     k.destroyAll("obstacle");
+    k.destroyAll("pickup");
+    k.destroyAll("decor");
     obstacles = [];
+    pickups = [];
+    shield = false;
+    invuln = 0;
+    signIn = 1000;
+    skyScroll = 0;
     distance = dbgStart;
     lastScore = -1;
     speed = START_SPEED;
@@ -485,6 +760,46 @@ export async function startDinoGame(
 
   cb.onReady?.();
   cb.onRunStart?.();
+
+  /** Cartel "Welcome to Las Vegas" que pasa de fondo cada 1000 puntos. */
+  const addSign = () => {
+    const o = k.add([
+      k.pos(W + 140, GROUND_Y + 2),
+      k.z(1.5),
+      {
+        draw() {
+          k.drawRect({ pos: k.vec2(-3, -118), width: 6, height: 118, color: WHITE, opacity: 0.55 });
+          k.drawPolygon({ pts: [k.vec2(0, -190), k.vec2(62, -140), k.vec2(0, -92), k.vec2(-62, -140)], color: WHITE, opacity: 0.9 });
+          k.drawPolygon({ pts: [k.vec2(0, -180), k.vec2(52, -140), k.vec2(0, -102), k.vec2(-52, -140)], color: INK, opacity: 0.95 });
+          k.drawText({ text: "LAS", size: 14, pos: k.vec2(0, -154), anchor: "center", color: WHITE });
+          k.drawText({ text: "VEGAS", size: 14, pos: k.vec2(0, -138), anchor: "center", color: WHITE });
+          k.drawText({ text: "*", size: 22, pos: k.vec2(0, -118), anchor: "center", color: WHITE });
+          k.drawCircle({ pos: k.vec2(0, -196), radius: 5, color: WHITE });
+        },
+      },
+      "decor",
+    ]);
+    return o;
+  };
+
+  // Aro de la ficha de la suerte alrededor de Manuel
+  k.add([
+    k.pos(0, 0),
+    k.z(6),
+    {
+      draw() {
+        if (!shield || !alive) return;
+        const pulse = 0.55 + Math.sin(k.time() * 8) * 0.25;
+        k.drawCircle({
+          pos: k.vec2(man.pos.x + manW * 0.02, man.pos.y - MAN_H * 0.5),
+          radius: MAN_H * 0.62,
+          fill: false,
+          outline: { width: 3, color: k.rgb(237, 232, 100) },
+          opacity: pulse,
+        });
+      },
+    },
+  ]);
 
   // ---------- Loop principal ----------
   k.onUpdate(() => {
@@ -522,6 +837,21 @@ export async function startDinoGame(
       lastScore = score;
       if (score > 0 && score % 100 === 0) sfx.point(); // pitido cada 100 puntos, como el dino
       cb.onScore?.(score);
+    }
+
+    skyScroll += speed * 0.07 * dt;
+    if (lastScore >= signIn) {
+      signIn += 1000;
+      addSign();
+    }
+    k.get("decor").forEach((d) => {
+      d.pos.x -= speed * 0.92 * dt;
+      if (d.pos.x < -200) d.destroy();
+    });
+    if (invuln > 0) {
+      invuln -= dt;
+      man.opacity = Math.sin(k.time() * 40) > 0 ? 1 : 0.35;
+      if (invuln <= 0) man.opacity = 1;
     }
 
     // Rayitas del suelo
@@ -581,10 +911,28 @@ export async function startDinoGame(
         spawn(nextKind, SPAWN_X);
         nextKind = pickKind();
         spawnIn = gapSeconds(nextKind);
+        // a veces aparece una ficha dorada en el hueco hasta el siguiente obstáculo
+        if (!shield && pickups.length === 0 && lastScore >= 200 && REL[nextKind] <= 1.05 && k.rand(0, 1) < 0.28) {
+          addPickup(SPAWN_X + spawnIn * speed * 0.5);
+        }
       }
     }
 
     const m = hit();
+    for (let i = pickups.length - 1; i >= 0; i--) {
+      const pk = pickups[i];
+      pk.obj.pos.x -= speed * dt;
+      const py = GROUND_Y - pk.cy;
+      if (pk.obj.pos.x < -60) {
+        pk.obj.destroy();
+        pickups.splice(i, 1);
+      } else if (m.r > pk.obj.pos.x - 15 && m.l < pk.obj.pos.x + 15 && m.b > py - 15 && m.t < py + 15) {
+        pk.obj.destroy();
+        pickups.splice(i, 1);
+        shield = true;
+        sfx.pickup();
+      }
+    }
     for (let i = obstacles.length - 1; i >= 0; i--) {
       const ob = obstacles[i];
       ob.obj.pos.x -= speed * ob.rel * dt;
@@ -597,11 +945,21 @@ export async function startDinoGame(
       const cy = GROUND_Y - ob.cy();
       if (
         !god &&
+        invuln <= 0 &&
         m.r > ob.obj.pos.x - ob.hw &&
         m.l < ob.obj.pos.x + ob.hw &&
         m.b > cy - ob.hh &&
         m.t < cy + ob.hh
       ) {
+        if (shield) {
+          // la ficha de la suerte absorbe el golpe y aparta el obstáculo
+          shield = false;
+          invuln = 0.8;
+          sfx.shieldBreak();
+          ob.obj.destroy();
+          obstacles.splice(i, 1);
+          continue;
+        }
         alive = false;
         deadAt = k.time();
         man.angle = -14;
