@@ -78,13 +78,15 @@
   justify-content: center;
   align-items: flex-end; /* el escenario se ancla abajo: Manu siempre toca el borde inferior */
 }
-/* El escenario cabe completo (ancho y alto) y se centra; el fondo llena el resto */
+/* El escenario ocupa el 100% del viewport en desktop; --ux y --uy adaptan al ancho y alto reales */
 .stage {
-  --u: min(calc(100cqw / 1920), calc(100cqh / 1080));
+  --ux: calc(100cqw / 1920);
+  --uy: calc(100cqh / 1080);
+  --u: min(calc(100cqw / 1920), calc(100cqh / 950));
   position: relative;
   flex: none;
-  width: calc(var(--u) * 1920);
-  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: 100%;
 }
 
 .abs {
@@ -119,14 +121,14 @@
 
 /* ---------- Personaje ---------- */
 .estrella {
-  left: calc(var(--u) * 256);
-  top: calc(var(--u) * 98);
+  left: calc(var(--ux) * 256);
+  bottom: calc(var(--uy) * 393);
   width: calc(var(--u) * 563);
   height: calc(var(--u) * 589);
 }
 .manu {
-  left: calc(var(--u) * 356);
-  top: calc(var(--u) * 162);
+  left: calc(var(--ux) * 356);
+  bottom: 0;
   width: calc(var(--u) * 392);
   height: calc(var(--u) * 918);
 }
@@ -134,8 +136,8 @@
 /* ---------- Título ---------- */
 .title {
   position: absolute;
-  left: calc(var(--u) * 770);
-  top: calc(var(--u) * 70);
+  left: calc(var(--ux) * 770);
+  top: calc(var(--uy) * 70);
   width: calc(var(--u) * 900);
   height: calc(var(--u) * 370);
   font-family: 'Amador TSP', 'UnifrakturCook', serif;
@@ -155,8 +157,8 @@
 .tKm { left: calc(var(--u) * 312); top: calc(var(--u) * 164); font-size: calc(var(--u) * 126); }
 .speed {
   position: absolute;
-  left: calc(var(--u) * 1275);
-  top: calc(var(--u) * 338);
+  left: calc(var(--ux) * 770 + var(--u) * 505);
+  top: calc(var(--uy) * 70 + var(--u) * 268);
   font-size: calc(var(--u) * 36);
   padding: calc(var(--u) * 26) calc(var(--u) * 16) calc(var(--u) * 20);
   transform: rotate(-5.8deg);
@@ -166,8 +168,8 @@
 
 .copy {
   position: absolute;
-  left: calc(var(--u) * 853);
-  top: calc(var(--u) * 464);
+  left: calc(var(--ux) * 853);
+  top: calc(var(--uy) * 464);
   width: calc(var(--u) * 850);
   margin: 0;
   font-weight: 500;
@@ -178,9 +180,11 @@
 
 /* ---------- Mapa ---------- */
 .map {
+  --u: min(calc(88.5cqw / 1700), calc(39.8cqh / 430));
   position: absolute;
-  left: calc(var(--u) * 110);
-  top: calc(var(--u) * 635);
+  left: 50%;
+  bottom: calc(var(--uy) * 15);
+  transform: translateX(-50%);
   width: calc(var(--u) * 1700);
   height: calc(var(--u) * 430);
 }
@@ -230,8 +234,8 @@
 /* ---------- Datos ---------- */
 .stats {
   position: absolute;
-  left: calc(var(--u) * 1285);
-  top: calc(var(--u) * 930);
+  right: calc(var(--ux) * 35);
+  bottom: calc(var(--uy) * 20);
   width: calc(var(--u) * 600);
   height: calc(var(--u) * 130);
 }
@@ -267,6 +271,7 @@
   }
   .stage {
     width: 100%;
+    height: auto;
     flex: 1 1 auto;
     aspect-ratio: auto;
     display: flex;
@@ -286,6 +291,7 @@
   .estrella {
     left: 8%;
     top: 0;
+    bottom: auto;
     width: 76%;
     height: auto;
     aspect-ratio: 563 / 589;
@@ -293,6 +299,7 @@
   .manu {
     left: 29%;
     top: 4%;
+    bottom: auto;
     width: 40%;
     height: auto;
     aspect-ratio: 392 / 918;
@@ -336,6 +343,8 @@
     position: relative;
     left: 0;
     top: 0;
+    bottom: auto;
+    transform: none;
     --u: calc((100cqw - 24px) / 1700);
     margin: 0 12px;
     flex: none;
@@ -344,7 +353,9 @@
   .stats {
     position: relative;
     left: 0;
+    right: auto;
     top: 0;
+    bottom: auto;
     --u: calc(min(100cqw, 600px) / 680);
     margin: 0 auto;
   }

@@ -116,13 +116,15 @@
   justify-content: center;
   align-items: flex-end; /* el escenario se ancla abajo */
 }
-/* El escenario cabe completo (ancho y alto) y se centra; el fondo llena el resto */
+/* El escenario ocupa el 100% del viewport en desktop; --ux y --uy adaptan al ancho y alto reales */
 .stage {
-  --u: min(calc(100cqw / 1920), calc(100cqh / 1080));
+  --ux: calc(100cqw / 1920);
+  --uy: calc(100cqh / 1080);
+  --u: min(calc(100cqw / 1920), calc(100cqh / 950));
   position: relative;
   flex: none;
-  width: calc(var(--u) * 1920);
-  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: 100%;
 }
 
 .img {
@@ -144,9 +146,11 @@
 /* Etiquetas amarillas (nav + botones) */
 /* ---------- Mapa del recorrido (1700 x 430, origen en 110, 635) ---------- */
 .map {
+  --u: min(calc(88.5cqw / 1700), calc(39.8cqh / 430));
   position: absolute;
-  left: calc(var(--u) * 110);
-  top: calc(var(--u) * 635);
+  left: 50%;
+  bottom: calc(var(--uy) * 15);
+  transform: translateX(-50%);
   width: calc(var(--u) * 1700);
   height: calc(var(--u) * 430);
 }
@@ -211,8 +215,8 @@
 /* ---------- Datos (km / temperatura / meta) ---------- */
 .stats {
   position: absolute;
-  left: calc(var(--u) * 1250);
-  top: calc(var(--u) * 930);
+  right: calc(var(--ux) * 30);
+  bottom: calc(var(--uy) * 10);
   width: calc(var(--u) * 640);
   height: calc(var(--u) * 140);
 }
@@ -244,6 +248,7 @@
   }
   .stage {
     width: 100%;
+    height: auto;
     flex: 1 1 auto;
     aspect-ratio: auto;
     display: flex;
@@ -262,6 +267,8 @@
     position: relative;
     left: 0;
     top: 0;
+    bottom: auto;
+    transform: none;
     --u: calc((100cqw - 24px) / 1700);
     margin: 0 12px;
     flex: none;
@@ -270,7 +277,9 @@
   .stats {
     position: relative;
     left: 0;
+    right: auto;
     top: 0;
+    bottom: auto;
     --u: calc(min(100cqw, 600px) / 680);
     margin: 0 auto;
   }

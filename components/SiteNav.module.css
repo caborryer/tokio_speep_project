@@ -17,8 +17,8 @@
 
 .nav {
   position: absolute;
-  left: calc(var(--u) * 48);
-  top: calc(var(--u) * 72);
+  left: calc(var(--ux, var(--u)) * 36);
+  top: calc(var(--uy, var(--u)) * 56);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -41,8 +41,8 @@
 
 .cta {
   position: absolute;
-  right: calc(var(--u) * 70);
-  top: calc(var(--u) * 52);
+  right: calc(var(--ux, var(--u)) * 48);
+  top: calc(var(--uy, var(--u)) * 44);
   font-size: calc(var(--u) * 30);
   padding: calc(var(--u) * 14) calc(var(--u) * 20);
   transform: rotate(-1deg);

@@ -62,8 +62,8 @@
 .hTitleBox {
   position: absolute;
   --k: 0.62;
-  left: calc(var(--u) * 341);
-  top: calc(var(--u) * 72);
+  left: calc(var(--ux) * 341);
+  top: calc(var(--uy) * 72);
   width: calc(var(--u) * 560);
   height: calc(var(--u) * 270);
 }
@@ -90,27 +90,39 @@
   text-transform: none;
 }
 .hCopy {
-  left: calc(var(--u) * 288);
-  top: calc(var(--u) * 331);
-  width: calc(var(--u) * 660);
+  left: calc(var(--ux) * 288);
+  top: calc(var(--uy) * 331);
+  width: calc(var(--ux) * 660);
   text-align: center; /* centrado bajo el título */
 }
 
 .video {
   position: absolute;
-  left: calc(var(--u) * 980);
-  top: calc(var(--u) * 130);
-  width: calc(var(--u) * 860);
-  height: calc(var(--u) * 500);
+  left: calc(var(--ux) * 980);
+  top: calc(var(--uy) * 130);
+  width: calc(var(--ux) * 860);
+  height: calc(var(--uy) * 500);
   background: var(--yellow);
   box-shadow: 0 calc(var(--u) * 10) calc(var(--u) * 30) rgba(0, 0, 0, 0.35);
+  overflow: hidden;
 }
-.video iframe,
 .video video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  border: 0;
+  background: #000;
+}
+.video iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%) scale(1.7);
+  transform-origin: center center;
   border: 0;
   background: #000;
 }
@@ -139,8 +151,8 @@
 .videoLink {
   position: absolute;
   z-index: 6; /* por encima de la capa del mapa, que si no intercepta los clics */
-  left: calc(var(--u) * 1190);
-  top: calc(var(--u) * 650);
+  left: calc(var(--ux) * 1190);
+  top: calc(var(--uy) * 650);
   padding: calc(var(--u) * 10) calc(var(--u) * 16);
   font-size: calc(var(--u) * 22);
   letter-spacing: 0.02em;
@@ -153,8 +165,9 @@
 }
 .tape1 {
   position: absolute;
-  left: calc(var(--u) * 930);
-  top: calc(var(--u) * 25);
+  z-index: 2;
+  left: calc(var(--ux) * 930);
+  top: calc(var(--uy) * 25);
   width: calc(var(--u) * 290);
   height: calc(var(--u) * 290);
   transform: rotate(-14deg);
@@ -162,8 +175,9 @@
 }
 .tape2 {
   position: absolute;
-  left: calc(var(--u) * 1668);
-  top: calc(var(--u) * 465);
+  z-index: 2;
+  left: calc(var(--ux) * 1668);
+  top: calc(var(--uy) * 465);
   width: calc(var(--u) * 245);
   height: calc(var(--u) * 245);
   transform: rotate(-8deg);
@@ -175,8 +189,8 @@
    ===================================================================== */
 .dTitle {
   position: absolute;
-  left: calc(var(--u) * 372);
-  top: calc(var(--u) * 82);
+  left: calc(var(--ux) * 372);
+  top: calc(var(--uy) * 82);
 }
 .dTitle span {
   display: block;
@@ -184,21 +198,21 @@
 .dT1 { font-size: calc(var(--u) * 150); }
 .dT2 { font-size: calc(var(--u) * 98); margin-top: calc(var(--u) * -24); }
 .dCopy {
-  left: calc(var(--u) * 384);
-  top: calc(var(--u) * 331);
-  width: calc(var(--u) * 640);
+  left: calc(var(--ux) * 384);
+  top: calc(var(--uy) * 331);
+  width: calc(var(--ux) * 640);
 }
 .dHead {
   position: absolute;
-  left: calc(var(--u) * 144);
-  top: calc(var(--u) * 500);
+  left: calc(var(--ux) * 144);
+  top: calc(var(--uy) * 500);
   width: calc(var(--u) * 140);
 }
 .bar {
   position: absolute;
-  left: calc(var(--u) * 300);
-  top: calc(var(--u) * 552);
-  width: calc(var(--u) * 927);
+  left: calc(var(--ux) * 300);
+  top: calc(var(--uy) * 552);
+  width: calc(var(--ux) * 927);
   height: calc(var(--u) * 64);
   border: calc(var(--u) * 6) solid #fff;
   padding: calc(var(--u) * 7) calc(var(--u) * 8);
@@ -211,9 +225,9 @@
 }
 .barText {
   position: absolute;
-  left: calc(var(--u) * 700);
-  width: calc(var(--u) * 521);
-  top: calc(var(--u) * 634);
+  left: calc(var(--ux) * 700);
+  width: calc(var(--ux) * 521);
+  top: calc(var(--uy) * 634);
   text-align: right;
   color: var(--yellow);
   font-weight: 700;
@@ -222,9 +236,9 @@
 }
 .coins {
   position: absolute;
-  left: calc(var(--u) * 1300);
-  top: calc(var(--u) * 188);
-  width: calc(var(--u) * 560);
+  left: calc(var(--ux) * 1300);
+  top: calc(var(--uy) * 188);
+  width: calc(var(--ux) * 560);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -232,7 +246,7 @@
 .coin {
   position: absolute;
   left: 0;
-  top: calc(var(--u) * var(--y));
+  top: calc(var(--uy) * var(--y));
   display: flex;
   align-items: center;
   height: calc(var(--u) * 76);
@@ -262,21 +276,21 @@
    ===================================================================== */
 .mTitle {
   position: absolute;
-  left: calc(var(--u) * 278);
-  top: calc(var(--u) * 212);
+  left: calc(var(--ux) * 278);
+  top: calc(var(--uy) * 212);
   font-size: calc(var(--u) * 124);
 }
 .mCopy {
-  left: calc(var(--u) * 281);
-  top: calc(var(--u) * 372);
-  width: calc(var(--u) * 800);
+  left: calc(var(--ux) * 281);
+  top: calc(var(--uy) * 372);
+  width: calc(var(--ux) * 800);
   font-size: calc(var(--u) * 29);
   line-height: 1.27;
 }
 .quote {
   position: absolute;
-  left: calc(var(--u) * 221);
-  top: calc(var(--u) * 520);
+  left: calc(var(--ux) * 221);
+  top: calc(var(--uy) * 520);
   margin: 0;
   color: var(--yellow);
   font-weight: 700;
@@ -289,8 +303,8 @@
 }
 .polaroid {
   position: absolute;
-  left: calc(var(--u) * 1161);
-  top: calc(var(--u) * 147);
+  left: calc(var(--ux) * 1161);
+  top: calc(var(--uy) * 147);
   width: calc(var(--u) * 500);
   aspect-ratio: 900 / 1060;
   transform: rotate(4.5deg);
@@ -352,21 +366,21 @@
    ===================================================================== */
 .kTitle {
   position: absolute;
-  left: calc(var(--u) * 293);
-  top: calc(var(--u) * 212);
+  left: calc(var(--ux) * 293);
+  top: calc(var(--uy) * 212);
   font-size: calc(var(--u) * 124);
 }
 .kCopy {
-  left: calc(var(--u) * 296);
-  top: calc(var(--u) * 365);
-  width: calc(var(--u) * 640);
+  left: calc(var(--ux) * 296);
+  top: calc(var(--uy) * 365);
+  width: calc(var(--ux) * 640);
 }
 .benefit {
   position: absolute;
   display: flex;
   align-items: center;
-  left: calc(var(--u) * var(--l));
-  top: calc(var(--u) * var(--t));
+  left: calc(var(--ux) * var(--l));
+  top: calc(var(--uy) * var(--t));
   transform: translateY(-50%);
   gap: calc(var(--u) * 14);
 }
@@ -385,8 +399,8 @@
 .truck {
   --k: calc(var(--u) * 0.96);
   position: absolute;
-  left: calc(var(--u) * 749);
-  top: calc(var(--u) * 38);
+  left: calc(var(--ux) * 749);
+  top: calc(var(--uy) * 38);
   width: calc(var(--k) * 1110);
   height: calc(var(--k) * 583);
 }
@@ -435,8 +449,8 @@
 }
 .joinBtn {
   position: absolute;
-  left: calc(var(--u) * 1211);
-  top: calc(var(--u) * 645);
+  left: calc(var(--ux) * 1211);
+  top: calc(var(--uy) * 645);
   font-size: calc(var(--u) * 31);
   padding: calc(var(--u) * 14) calc(var(--u) * 14);
   transform: rotate(-1deg);
@@ -450,14 +464,14 @@
   position: absolute;
   left: 0;
   width: 100%;
-  top: calc(var(--u) * 52);
+  top: calc(var(--uy) * 52);
   text-align: center;
   font-size: calc(var(--u) * 176);
 }
 .rCopy {
-  left: calc(var(--u) * 640);
-  top: calc(var(--u) * 252);
-  width: calc(var(--u) * 640);
+  left: calc(var(--ux) * 640);
+  top: calc(var(--uy) * 252);
+  width: calc(var(--ux) * 640);
   text-align: center;
 }
 .rRoute {
@@ -483,8 +497,8 @@
 .msIcon,
 .msText {
   position: absolute;
-  left: calc(var(--u) * var(--l));
-  top: calc(var(--u) * var(--t));
+  left: calc(var(--ux) * var(--l));
+  top: calc(var(--uy) * var(--t));
 }
 .msNum {
   width: calc(var(--u) * var(--w));
@@ -503,7 +517,7 @@
   width: calc(var(--u) * var(--w));
 }
 .msText {
-  width: calc(var(--u) * var(--w));
+  width: calc(var(--ux) * var(--w));
 }
 .msText h3 {
   margin: 0 0 calc(var(--u) * 6);
@@ -527,24 +541,25 @@
    ===================================================================== */
 .sTitle {
   position: absolute;
-  left: calc(var(--u) * 293);
-  top: calc(var(--u) * 150);
+  left: calc(var(--ux) * 293);
+  top: calc(var(--uy) * 150);
   font-size: calc(var(--u) * 124);
 }
 .sCopy {
-  left: calc(var(--u) * 296);
-  top: calc(var(--u) * 300);
-  width: calc(var(--u) * 900);
+  left: calc(var(--ux) * 296);
+  top: calc(var(--uy) * 300);
+  width: calc(var(--ux) * 900);
 }
 
 /* Tienda: 4 tarjetas */
 .shopGrid {
   position: absolute;
-  left: calc(var(--u) * 296);
-  top: calc(var(--u) * 430);
+  left: calc(var(--ux) * 296);
+  top: calc(var(--uy) * 430);
+  width: calc(var(--ux) * 1490);
   display: grid;
-  grid-template-columns: repeat(4, calc(var(--u) * 350));
-  gap: calc(var(--u) * 30);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(var(--ux) * 30);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -611,8 +626,8 @@ a.shopCard:focus-visible {
 }
 .shopCta {
   position: absolute;
-  left: calc(var(--u) * 296);
-  top: calc(var(--u) * 920);
+  left: calc(var(--ux) * 296);
+  top: calc(var(--uy) * 920);
   font-size: calc(var(--u) * 31);
   padding: calc(var(--u) * 14) calc(var(--u) * 20);
   transform: rotate(-1deg);
@@ -628,9 +643,9 @@ a.shopCta:focus-visible {
 /* Aliados: cuadrícula de logos */
 .allyGrid {
   position: absolute;
-  left: calc(var(--u) * 296);
-  top: calc(var(--u) * 410);
-  width: calc(var(--u) * 1380);
+  left: calc(var(--ux) * 296);
+  top: calc(var(--uy) * 410);
+  width: calc(var(--ux) * 1490);
   display: grid;
   grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
   gap: calc(var(--u) * 24);
