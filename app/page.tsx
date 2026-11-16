@@ -22,7 +22,6 @@ const HOME_ASSETS = [
   "/home/city.svg",
   "/home/death-valley.svg",
   "/home/las-vegas.svg",
-  "/home/logo.webp",
   "/home/estrella-mapa.svg",
   "/home/brujula.svg",
   "/home/encendedor.svg",
@@ -97,7 +96,6 @@ export default function Home() {
               <div className={styles.mVegas}><Pic src="/home/las-vegas.svg" w={680} h={672} className={styles.line} /></div>
               <DraggableHead className={styles.mHead}><Icon name="manu-pixel" className={styles.img} /></DraggableHead>
               <div className={styles.mStart}><Icon name="start" className={styles.img} /></div>
-              <div className={styles.mBubble}><Pic src="/home/logo.webp" w={450} h={450} /></div>
               <div className={styles.mStar}><Pic src="/home/estrella-mapa.svg" w={347} h={331} /></div>
             </div>
           </div>

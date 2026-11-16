@@ -241,21 +241,25 @@
 /* ---------- Móvil / tablet: composición apilada ---------- */
 @container (max-width: 899px) and (max-aspect-ratio: 1/1) {
   .fit {
-    align-items: flex-start;
+    align-items: stretch;
+    width: calc(100% / var(--s));
     height: calc(100% / var(--s));
     transform: scale(var(--s));
-    transform-origin: 50% 0;
+    transform-origin: 0 0;
   }
   .stage {
     width: 100%;
+    min-height: 100%;
     height: auto;
     flex: 1 1 auto;
     aspect-ratio: auto;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: stretch;
-    padding: 18px 0 44px;
-    gap: 22px;
+    padding: 14px 0 18px;
+    gap: 14px;
+    box-sizing: border-box;
   }
 
   .mapWrap {
@@ -269,8 +273,8 @@
     top: 0;
     bottom: auto;
     transform: none;
-    --u: calc((100cqw - 24px) / 1700);
-    margin: 0 12px;
+    --u: calc((100% - 16px) / 1700);
+    margin: 0 8px;
     flex: none;
   }
 
@@ -280,7 +284,7 @@
     right: auto;
     top: 0;
     bottom: auto;
-    --u: calc(min(100cqw, 600px) / 680);
+    --u: calc(min(100%, 640px) / 660);
     margin: 0 auto;
   }
 }

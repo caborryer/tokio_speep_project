@@ -725,7 +725,7 @@ a.shopCta:focus-visible {
   .videoLink {
     position: static;
     align-self: center;
-    margin: 4px 0 8px;
+    margin: 2px 0 4px;
     padding: 9px 12px;
     font-size: clamp(13px, 3.8vw, 17px);
   }
@@ -733,8 +733,8 @@ a.shopCta:focus-visible {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 22px;
-    --m: 20px;
+    gap: 14px;
+    --m: 12px;
   }
   .abs,
   .copy,
@@ -760,7 +760,7 @@ a.shopCta:focus-visible {
     width: auto;
     padding: 0 var(--m);
     font-size: clamp(15px, 4.2vw, 19px);
-    line-height: 1.4;
+    line-height: 1.38;
   }
   .copy span {
     display: inline;
@@ -769,17 +769,17 @@ a.shopCta:focus-visible {
   /* ---- Inicio ---- */
   .hTitleBox {
     position: relative;
-    --u: calc(100cqw / 640);
+    --u: calc(100cqw / 600 / var(--s, 1));
     left: auto;
     top: auto;
     width: calc(var(--u) * 560);
-    height: calc(var(--u) * 270);
-    margin: 4px auto 0;
+    height: calc(var(--u) * 260);
+    margin: 2px auto 0;
   }
   .video {
-    --u: calc(100cqw / 1000);
-    margin: 18px auto 6px;
-    width: min(calc(100% - 32px), 720px);
+    --u: calc(100cqw / 1000 / var(--s, 1));
+    margin: 8px auto 4px;
+    width: calc(100% - 24px);
     left: auto;
     top: auto;
     height: auto;
@@ -930,11 +930,11 @@ a.shopCta:focus-visible {
     font-size: clamp(11px, 3.3vw, 14px);
   }
   .truck {
-    --k: calc((100cqw - 24px) / 1130);
+    --k: calc((100cqw - 16px) / 1130 / var(--s, 1));
     position: relative;
     left: auto;
     top: auto;
-    margin: 6px auto 0;
+    margin: 4px auto 0;
   }
   .truck > * {
     position: absolute;

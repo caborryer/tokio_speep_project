@@ -55,9 +55,9 @@
     position: static;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 0 16px;
-    padding-right: 150px; /* deja espacio al botón Compra ahora */
+    gap: 8px;
+    padding: 0 12px;
+    padding-right: 138px; /* deja espacio al botón Compra ahora */
   }
   .nav .tag,
   .nav .tag:nth-child(n) {
@@ -67,8 +67,8 @@
   }
   .cta {
     position: absolute;
-    right: 16px;
-    top: 18px;
+    right: 12px;
+    top: 14px;
     font-size: clamp(13px, 4vw, 17px);
     padding: 8px 12px;
   }

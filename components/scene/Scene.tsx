@@ -87,11 +87,6 @@ export default function Scene({ bg, map, stats, children }: Props) {
               {map.head && (
                 <DraggableHead className={styles.mHead} style={at(map.head)}><Icon name="manu-pixel" className={styles.img} /></DraggableHead>
               )}
-              {map.bubble && (
-                <div className={styles.mBubble} style={at(map.bubble)}>
-                  <Pic src="/home/logo.webp" w={450} h={450} />
-                </div>
-              )}
               <div className={styles.mStar} style={at(map.star)}>
                 <Pic src="/home/estrella-mapa.svg" w={347} h={331} />
               </div>

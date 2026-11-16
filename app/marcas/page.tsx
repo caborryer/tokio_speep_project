@@ -44,8 +44,6 @@ const MARKS: Mark[] = [
   // carrocería
   { x: 290, y: 346, w: 142, h: 33, r: -1, f: 17, text: "Tu marca" },
   { x: 226, y: 425, w: 66, h: 36, r: -3, f: 11, text: "Tu marca" },
-  { x: 489, y: 343, w: 96, h: 96, r: 0, text: "", kind: "logo" },
-  { x: 655, y: 341, w: 96, h: 96, r: 0, text: "", kind: "logo" },
   { x: 838, y: 380, w: 28, h: 52, r: 0, text: "", kind: "lamp" },
 ];
 
@@ -98,11 +96,7 @@ export default function MarcasPage() {
                 { "--x": m.x, "--y": m.y, "--w": m.w, "--h": m.h, "--r": m.r, "--f": m.f ?? 17 } as React.CSSProperties
               }
             >
-              {m.kind === "logo" ? (
-                <Image src="/home/logo.webp" alt="" width={450} height={450} unoptimized draggable={false} />
-              ) : (
-                m.text
-              )}
+              {m.text}
             </span>
           ))}
         </div>
