@@ -71,10 +71,6 @@ const CAROUSEL_H = 340;
 /** Fraction of the canvas height used by cut-out photos (the shirt fills the top part only). */
 const PHOTO_BOTTOM = 0.74;
 const DEFAULT_LABELS: ClothingRailHeroLabels = { front: "Front", back: "Back", close: "Close", show: "Show", zoom: "Zoom" };
-const LENS_R = 90;
-const LENS_ZOOM = 2.4;
-
-type Lens = { x: number; y: number; size: string; pos: string };
 
 type Tone = { d: string; t: number };
 type Art = {
@@ -1096,36 +1092,13 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
   const closeRef = React.useRef(null as HTMLButtonElement | null);
   const [side, setSide] = React.useState("front" as "front" | "back");
   const [shown, setShown] = React.useState(false);
-  const angle = React.useRef({ value: 0, target: 0, velocity: 0, raf: 0, last: 0, dragging: false, startX: 0, startAngle: 0 });
+  const [zoomOpen, setZoomOpen] = React.useState(false);
+  const angle = React.useRef({ value: 0, target: 0, velocity: 0, raf: 0, last: 0, dragging: false, startX: 0, startY: 0, startAngle: 0, moved: false });
   const closing = React.useRef(false);
-  const [zoom, setZoom] = React.useState(false);
-  const [lens, setLens] = React.useState(null as Lens | null);
   const kind = item.kind ?? "tee";
   const color = item.color ?? "var(--rail-muted)";
   const trim = item.trim ?? mix(color, -0.12);
-  const lensSrc = (side === "back" ? item.backImage : undefined) ?? item.image;
-
-  /** Places the magnifier under the pointer, mapping it onto the photo drawn inside the figure. */
-  function moveLens(event: React.PointerEvent<HTMLDivElement>) {
-    const host = event.currentTarget;
-    const box = host.getBoundingClientRect();
-    const k = host.offsetWidth > 0 && box.width > 0 ? box.width / host.offsetWidth : 1;
-    const x = (event.clientX - box.left) / k;
-    const y = (event.clientY - box.top) / k;
-    const W = host.offsetWidth;
-    const H = host.offsetHeight;
-    const top = hanger === "none" ? 0 : H * 0.08;
-    const boxH = H - top;
-    const rh = Math.min(boxH, W / ASPECT);
-    const rw = rh * ASPECT;
-    const left = (W - rw) / 2;
-    setLens({
-      x,
-      y,
-      size: `${(rw * LENS_ZOOM).toFixed(1)}px ${(rh * LENS_ZOOM).toFixed(1)}px`,
-      pos: `${(-((x - left) * LENS_ZOOM - LENS_R)).toFixed(1)}px ${(-((y - top) * LENS_ZOOM - LENS_R)).toFixed(1)}px`,
-    });
-  }
+  const zoomSrc = (side === "back" ? item.backImage : undefined) ?? item.image;
   const titleId = `${uid}-detail-title`;
 
   const spin = React.useCallback(() => {
@@ -1202,19 +1175,32 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
     const onKey = (event: KeyboardEvent) => {
       const dialog = dialogRef.current;
       if (!dialog || dialog.contains(event.target as Node)) return;
-      if (event.key === "Escape") { event.preventDefault(); dismiss(); }
-      else if (event.key === "ArrowLeft" || event.key === "ArrowRight") turnTo(side === "front" ? "back" : "front");
-      else if (event.key === "Tab") { const first = dialog.querySelector("button"); if (first) { event.preventDefault(); first.focus(); } }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        if (zoomOpen) setZoomOpen(false);
+        else dismiss();
+      } else if (!zoomOpen && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+        turnTo(side === "front" ? "back" : "front");
+      } else if (event.key === "Tab") {
+        const first = dialog.querySelector("button");
+        if (first) { event.preventDefault(); first.focus(); }
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [dismiss, turnTo, side]);
+  }, [dismiss, turnTo, side, zoomOpen]);
 
   const onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Escape") { event.preventDefault(); dismiss(); return; }
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight") { turnTo(side === "front" ? "back" : "front"); return; }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      if (zoomOpen) setZoomOpen(false);
+      else dismiss();
+      return;
+    }
+    if (!zoomOpen && (event.key === "ArrowLeft" || event.key === "ArrowRight")) { turnTo(side === "front" ? "back" : "front"); return; }
     if (event.key !== "Tab") return;
-    const controls = [...(dialogRef.current?.querySelectorAll("button") ?? [])].filter((node) => !node.disabled);
+    const scope = zoomOpen ? dialogRef.current?.querySelector("[data-zoom-overlay]") : dialogRef.current;
+    const controls = [...(scope?.querySelectorAll("button") ?? [])].filter((node) => !node.disabled);
     const first = controls[0];
     const last = controls.at(-1);
     if (!first || !last) return;
@@ -1226,12 +1212,50 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
     <div ref={figureRef} className={s.figure}>
       <div aria-hidden="true" className={s.cord} style={{ top: `calc(-40vh + ${(HOOK_TOP / VB_H) * 100}%)` }} />
       <div
-        className={`${s.spinHost} ${zoom ? s.spinHostZoom : ""}`}
-        onPointerLeave={() => { if (zoom) setLens(null); }}
-        onPointerDown={(event) => { if (zoom) { event.currentTarget.setPointerCapture(event.pointerId); moveLens(event); return; } const a = angle.current; a.dragging = true; a.startX = event.clientX; a.startAngle = a.value; cancelAnimationFrame(a.raf); a.raf = 0; a.last = 0; event.currentTarget.setPointerCapture(event.pointerId); }}
-        onPointerMove={(event) => { if (zoom) { moveLens(event); return; } const a = angle.current; if (!a.dragging) return; a.value = clamp(a.startAngle + (event.clientX - a.startX) * 0.45, a.startAngle - 220, a.startAngle + 220); if (spinRef.current) spinRef.current.style.transform = `rotateY(${a.value.toFixed(2)}deg)`; }}
-        onPointerUp={(event) => { if (zoom) { if (event.pointerType !== "mouse") setLens(null); return; } const a = angle.current; if (!a.dragging) return; a.dragging = false; const facing = (((a.value % 360) + 360) % 360); turnTo(facing > 90 && facing < 270 ? "back" : "front"); }}
-        onPointerCancel={() => { if (zoom) { setLens(null); return; } angle.current.dragging = false; turnTo(side); }}
+        data-garment-stage
+        className={`${s.spinHost} ${item.image ? s.spinHostZoomable : ""}`}
+        onPointerDown={(event) => {
+          if (event.button !== 0) return;
+          const a = angle.current;
+          a.dragging = true;
+          a.startX = event.clientX;
+          a.startY = event.clientY;
+          a.startAngle = a.value;
+          a.moved = false;
+          cancelAnimationFrame(a.raf);
+          a.raf = 0;
+          a.last = 0;
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerMove={(event) => {
+          const a = angle.current;
+          if (!a.dragging) return;
+          const dx = event.clientX - a.startX;
+          const dy = event.clientY - a.startY;
+          if (!a.moved && Math.hypot(dx, dy) > 6) a.moved = true;
+          if (!a.moved) return;
+          a.value = clamp(a.startAngle + dx * 0.45, a.startAngle - 220, a.startAngle + 220);
+          if (spinRef.current) spinRef.current.style.transform = `rotateY(${a.value.toFixed(2)}deg)`;
+        }}
+        onPointerUp={(event) => {
+          const a = angle.current;
+          if (!a.dragging) return;
+          a.dragging = false;
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          }
+          if (!a.moved) {
+            if (item.image) setZoomOpen(true);
+            return;
+          }
+          const facing = (((a.value % 360) + 360) % 360);
+          turnTo(facing > 90 && facing < 270 ? "back" : "front");
+        }}
+        onPointerCancel={() => {
+          const a = angle.current;
+          a.dragging = false;
+          if (a.moved) turnTo(side);
+        }}
       >
         <div ref={spinRef} className={s.spin}>
           {(["front", "back"] as const).map((face) => (
@@ -1244,9 +1268,6 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
           ))}
         </div>
       </div>
-      {zoom && lens && lensSrc && (
-        <div aria-hidden="true" className={s.lens} style={{ left: lens.x - LENS_R, top: lens.y - LENS_R, width: LENS_R * 2, height: LENS_R * 2, backgroundImage: `url("${lensSrc}")`, backgroundSize: lens.size, backgroundPosition: lens.pos }} />
-      )}
     </div>
   );
 
@@ -1276,16 +1297,190 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
               </button>
             ))}
           </div>
-          {item.image && (
-            <button type="button" aria-pressed={zoom} onClick={() => { setZoom((z) => !z); setLens(null); }} className={`${s.zoomBtn} ${zoom ? s.zoomBtnOn : ""}`}>
-              <svg aria-hidden="true" viewBox="0 0 16 16" className={s.zoomIcon} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="7" cy="7" r="4.6" /><path d="M10.4 10.4L14 14M7 5v4M5 7h4" /></svg>
-              {labels.zoom ?? "Zoom"}
-            </button>
-          )}
         </div>
       </div>
+      {zoomOpen && zoomSrc && (
+        <ZoomOverlay
+          src={zoomSrc}
+          alt={item.name}
+          closeLabel={labels.close}
+          reduced={reduced}
+          onClose={() => {
+            setZoomOpen(false);
+            closeRef.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
     </div>,
     document.body,
+  );
+}
+
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 3.5;
+const ZOOM_STEP = 0.5;
+
+function ZoomOverlay({ src, alt, closeLabel, reduced, onClose }: {
+  src: string;
+  alt: string;
+  closeLabel: string;
+  reduced: boolean;
+  onClose: () => void;
+}) {
+  const canvasRef = React.useRef<HTMLDivElement | null>(null);
+  const imgRef = React.useRef<HTMLImageElement | null>(null);
+  const closeZoomRef = React.useRef<HTMLButtonElement | null>(null);
+  const [scale, setScale] = React.useState(() => (typeof window !== "undefined" && window.innerWidth < 768 ? 1.8 : 2));
+  const [pos, setPos] = React.useState({ x: 0, y: 0 });
+  const [panning, setPanning] = React.useState(false);
+  const stateRef = React.useRef({ scale: 2, pos: { x: 0, y: 0 } });
+  const pointers = React.useRef(new Map<number, { x: number; y: number }>());
+  const gesture = React.useRef({ startX: 0, startY: 0, startPosX: 0, startPosY: 0, moved: false, pinched: false, pinchDist: 0, pinchScale: 2 });
+
+  React.useEffect(() => {
+    stateRef.current = { scale, pos };
+  }, [scale, pos]);
+
+  React.useEffect(() => {
+    closeZoomRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  const clampPos = React.useCallback((x: number, y: number, nextScale: number) => {
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img || nextScale <= 1) return { x: 0, y: 0 };
+    const maxX = Math.max(0, (img.offsetWidth * nextScale - canvas.clientWidth * 0.35) / 2);
+    const maxY = Math.max(0, (img.offsetHeight * nextScale - canvas.clientHeight * 0.35) / 2);
+    return { x: clamp(x, -maxX, maxX), y: clamp(y, -maxY, maxY) };
+  }, []);
+
+  const applyScale = React.useCallback((next: number) => {
+    const clamped = Math.round(clamp(next, ZOOM_MIN, ZOOM_MAX) * 100) / 100;
+    setScale(clamped);
+    setPos((prev) => clampPos(prev.x, prev.y, clamped));
+  }, [clampPos]);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      applyScale(stateRef.current.scale - event.deltaY * 0.0025);
+    };
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    return () => canvas.removeEventListener("wheel", onWheel);
+  }, [applyScale]);
+
+  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 && event.pointerType === "mouse") return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    const g = gesture.current;
+    if (pointers.current.size === 1) {
+      g.startX = event.clientX;
+      g.startY = event.clientY;
+      g.startPosX = stateRef.current.pos.x;
+      g.startPosY = stateRef.current.pos.y;
+      g.moved = false;
+      g.pinched = false;
+    } else if (pointers.current.size === 2) {
+      const [a, b] = [...pointers.current.values()];
+      g.pinchDist = Math.hypot((a?.x ?? 0) - (b?.x ?? 0), (a?.y ?? 0) - (b?.y ?? 0));
+      g.pinchScale = stateRef.current.scale;
+      g.moved = true;
+      g.pinched = true;
+      setPanning(true);
+    }
+  };
+
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!pointers.current.has(event.pointerId)) return;
+    pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    const g = gesture.current;
+    if (pointers.current.size === 2) {
+      const [a, b] = [...pointers.current.values()];
+      const dist = Math.hypot((a?.x ?? 0) - (b?.x ?? 0), (a?.y ?? 0) - (b?.y ?? 0));
+      if (g.pinchDist > 0) applyScale(g.pinchScale * (dist / g.pinchDist));
+      return;
+    }
+    if (g.pinched) return;
+    const dx = event.clientX - g.startX;
+    const dy = event.clientY - g.startY;
+    if (!g.moved && Math.hypot(dx, dy) > 6) {
+      g.moved = true;
+      setPanning(true);
+    }
+    if (!g.moved) return;
+    setPos(clampPos(g.startPosX + dx, g.startPosY + dy, stateRef.current.scale));
+  };
+
+  const finishPointer = (event: React.PointerEvent<HTMLDivElement>, cancelled: boolean) => {
+    if (!pointers.current.has(event.pointerId)) return;
+    pointers.current.delete(event.pointerId);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    const g = gesture.current;
+    if (pointers.current.size === 0) {
+      setPanning(false);
+      if (!cancelled && !g.moved && !g.pinched) onClose();
+    } else if (pointers.current.size === 1) {
+      const [remaining] = [...pointers.current.values()];
+      if (remaining) {
+        g.startX = remaining.x;
+        g.startY = remaining.y;
+        g.startPosX = stateRef.current.pos.x;
+        g.startPosY = stateRef.current.pos.y;
+      }
+    }
+  };
+
+  return (
+    <div data-zoom-overlay className={s.zoomOverlay} role="region" aria-label={alt}>
+      <div
+        ref={canvasRef}
+        className={`${s.zoomCanvas} ${panning ? s.zoomCanvasPanning : ""}`}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={(event) => finishPointer(event, false)}
+        onPointerCancel={(event) => finishPointer(event, true)}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          ref={imgRef}
+          src={src}
+          alt={alt}
+          draggable={false}
+          className={`${s.zoomImg} ${panning || reduced ? s.zoomImgInstant : ""}`}
+          style={{ transform: `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, 0) scale(${scale})` }}
+        />
+      </div>
+      <div className={s.zoomBar} onPointerDown={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          className={s.zoomCtrl}
+          aria-label="Alejar"
+          disabled={scale <= ZOOM_MIN}
+          onClick={() => applyScale(scale - ZOOM_STEP)}
+        >
+          −
+        </button>
+        <span className={s.zoomPct} aria-live="polite">{Math.round(scale * 100)}%</span>
+        <button
+          type="button"
+          className={s.zoomCtrl}
+          aria-label="Acercar"
+          disabled={scale >= ZOOM_MAX}
+          onClick={() => applyScale(scale + ZOOM_STEP)}
+        >
+          +
+        </button>
+        <button ref={closeZoomRef} type="button" className={s.zoomClose} onClick={onClose}>
+          {closeLabel}
+          <svg aria-hidden="true" viewBox="0 0 16 16" className={s.closeIcon} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13" /></svg>
+        </button>
+      </div>
+    </div>
   );
 }
 

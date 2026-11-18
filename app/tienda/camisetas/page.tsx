@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "Las camisetas de El Reto 500 Kilómetros: recorre el riel, gira cada pieza y mira el frente y la espalda.",
 };
 
-const LABELS = { front: "Frente", back: "Espalda", close: "Cerrar", show: "Ver", zoom: "Ampliar" };
+const LABELS = { front: "Frente", back: "Espalda", close: "Cerrar", show: "Ver" };
 
 export default function CamisetasPage() {
   return (

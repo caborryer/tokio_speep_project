@@ -59,9 +59,17 @@ test.describe("menú y páginas nuevas", () => {
     const dialog = page.getByRole("dialog", { name: "Samurái" });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Cerrar" })).toBeFocused();
+    await expect(dialog.getByRole("button", { name: "Ampliar" })).toHaveCount(0);
     await expect(dialog.getByRole("button", { name: "Frente" })).toBeVisible();
     await dialog.getByRole("button", { name: "Espalda" }).click();
     await expect(dialog.getByRole("button", { name: "Espalda" })).toHaveAttribute("aria-pressed", "true");
+    await dialog.locator("[data-garment-stage]").click();
+    const zoom = dialog.locator("[data-zoom-overlay]");
+    await expect(zoom).toBeVisible();
+    await expect(zoom.locator("img")).toHaveAttribute("src", /samurai-back\.png$/);
+    await page.keyboard.press("Escape");
+    await expect(zoom).toHaveCount(0);
+    await expect(dialog).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(pieces.nth(1)).toBeFocused();
@@ -69,6 +77,32 @@ test.describe("menú y páginas nuevas", () => {
     await page.getByRole("link", { name: /Tienda/ }).filter({ hasText: "←" }).click();
     await expect(page).toHaveURL(/\/tienda$/);
     expect(errors).toEqual([]);
+  });
+
+  test("/tienda/camisetas detalle móvil: Frente y Espalda quedan dentro del fondo negro", async ({ page }) => {
+    for (const vp of [{ width: 390, height: 844 }, { width: 375, height: 667 }]) {
+      await page.setViewportSize(vp);
+      await page.goto("/tienda/camisetas");
+      const first = page.locator("[data-garment]").first();
+      await first.focus();
+      await page.keyboard.press("Enter");
+      const dialog = page.getByRole("dialog", { name: "Gótica" });
+      await expect(dialog).toBeVisible();
+      const backdrop = dialog.locator("[aria-hidden='true']").first();
+      const bgBox = (await backdrop.boundingBox())!;
+      const dialogBox = (await dialog.boundingBox())!;
+      for (const label of ["Frente", "Espalda"]) {
+        const btn = dialog.getByRole("button", { name: label });
+        await expect(btn).toBeVisible();
+        const b = (await btn.boundingBox())!;
+        expect(b.x, `${label} left @ ${vp.width}x${vp.height}`).toBeGreaterThanOrEqual(bgBox.x);
+        expect(b.x + b.width, `${label} right @ ${vp.width}x${vp.height}`).toBeLessThanOrEqual(bgBox.x + bgBox.width + 1);
+        expect(b.y, `${label} top @ ${vp.width}x${vp.height}`).toBeGreaterThanOrEqual(bgBox.y);
+        expect(b.y + b.height, `${label} bottom @ ${vp.width}x${vp.height}`).toBeLessThanOrEqual(Math.min(bgBox.y + bgBox.height, dialogBox.y + dialogBox.height) + 1);
+      }
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+    }
   });
 
   test("/aliados muestra las marcas y la tarjeta 'Tu marca aquí' lleva a /marcas", async ({ page }) => {
