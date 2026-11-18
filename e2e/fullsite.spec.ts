@@ -127,11 +127,48 @@ test.describe("menú y páginas nuevas", () => {
   test("ninguna vista tiene scroll vertical (escritorio y móvil)", async ({ page }) => {
     for (const vp of [{ width: 1366, height: 768 }, { width: 390, height: 844 }]) {
       await page.setViewportSize(vp);
-      for (const path of ["/reto", "/dona", "/manu", "/marcas", "/road-to-500", "/tienda", "/aliados"]) {
+      for (const path of ["/reto", "/dona", "/manu", "/marcas", "/road-to-500", "/tienda", "/tienda/camisetas", "/aliados"]) {
         await page.goto(path);
         await page.waitForTimeout(400);
         expect(await noVerticalScroll(page), `${path} @ ${vp.width}x${vp.height}`).toBe(true);
       }
+    }
+  });
+
+  test("móvil: sin menú hamburguesa antiguo superpuesto sobre SiteNav en / y /tienda/camisetas", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const path of ["/tienda/camisetas", "/"]) {
+      await page.goto(path);
+      await expect(page.locator("header.app-header")).toHaveCount(0);
+      await expect(page.getByRole("navigation", { name: "Principal" })).toBeVisible();
+      expect(await noVerticalScroll(page), `${path} @ 390x844`).toBe(true);
+    }
+  });
+
+  test("inicio (/): título 'el Reto 500 Kilometros' y 'The Speed Project' no se superponen con el texto descriptivo", async ({ page }) => {
+    const viewports = [
+      { width: 390, height: 844 },
+      { width: 375, height: 667 },
+      { width: 844, height: 390 },
+      { width: 1366, height: 768 },
+    ];
+    for (const vp of viewports) {
+      await page.setViewportSize(vp);
+      await page.goto("/");
+      await page.waitForTimeout(400);
+      const heading = page.getByRole("heading", { name: /El Reto, 500 Kilómetros/i });
+      const speed = page.getByText("The Speed Project", { exact: true });
+      const copy = page.getByText(/Primer colombiano en completar/i);
+      const copyBox = (await copy.boundingBox())!;
+      const speedBox = (await speed.boundingBox())!;
+      expect(speedBox.y + speedBox.height, `speed vs copy @ ${vp.width}x${vp.height}`).toBeLessThanOrEqual(copyBox.y + 1);
+      const spans = heading.locator("span");
+      const count = await spans.count();
+      for (let i = 0; i < count; i++) {
+        const box = (await spans.nth(i).boundingBox())!;
+        expect(box.y + box.height, `title span ${i} vs copy @ ${vp.width}x${vp.height}`).toBeLessThanOrEqual(copyBox.y + 1);
+      }
+      expect(await noVerticalScroll(page), `home scroll @ ${vp.width}x${vp.height}`).toBe(true);
     }
   });
 });

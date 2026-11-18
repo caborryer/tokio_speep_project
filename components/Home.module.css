@@ -169,7 +169,7 @@
 .copy {
   position: absolute;
   left: calc(var(--ux) * 853);
-  top: calc(var(--uy) * 464);
+  top: calc(var(--uy) * 70 + var(--u) * 405);
   width: calc(var(--u) * 850);
   margin: 0;
   font-weight: 500;
@@ -288,8 +288,9 @@
   .hero {
     display: block;
     position: relative;
+    flex: none;
     width: 100%;
-    aspect-ratio: 1 / 0.88;
+    aspect-ratio: 1 / 0.92;
     margin-top: 2px;
   }
   .estrella {
@@ -312,10 +313,11 @@
   .titleBox {
     display: block;
     position: relative;
+    flex: none;
     --u: calc(100cqw / 960 / var(--s, 1));
     width: calc(var(--u) * 900);
-    height: calc(var(--u) * 380);
-    margin: 0 auto;
+    height: calc(var(--u) * 430);
+    margin: calc(var(--u) * 28) auto 0;
   }
   .title {
     left: 0;
@@ -328,8 +330,10 @@
 
   .copy {
     position: static;
+    flex: none;
     width: auto;
     padding: 0 14px;
+    margin-top: 6px;
     font-size: calc(clamp(15px, 4.2vw, 19px) / var(--s, 1));
     line-height: 1.35;
   }
