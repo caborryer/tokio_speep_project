@@ -67,9 +67,9 @@ const GAP = 0.035;
 const MAX_H = 400;
 const MIN_WIDE_H = 200;
 const CAROUSEL_H = 340;
-/* With photos the hanger sits inside the garment: only the hook shows above the collar. */
-/** Fraction of the canvas height used by cut-out photos (the shirt fills the top part only). */
-const PHOTO_BOTTOM = 0.74;
+/* Hanging garment photos fill nearly the full 200×310 portrait canvas (including the wooden hanger). */
+/** Fraction of the canvas height used by cut-out photos. */
+const PHOTO_BOTTOM = 0.96;
 const DEFAULT_LABELS: ClothingRailHeroLabels = { front: "Front", back: "Back", close: "Close", show: "Show", zoom: "Zoom" };
 
 type Tone = { d: string; t: number };

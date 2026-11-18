@@ -223,7 +223,7 @@
   display: block;
   position: absolute;
   background: #000;
-  opacity: 0.55;
+  opacity: 0.42;
 }
 .turn {
   border-radius: 8px;
@@ -601,7 +601,7 @@
   object-fit: contain;
   pointer-events: none;
   user-select: none;
-  transform-origin: 50% 38%;
+  transform-origin: 50% 48%;
   will-change: transform;
   transition: transform 0.2s ease-out;
 }

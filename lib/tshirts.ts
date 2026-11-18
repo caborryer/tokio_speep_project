@@ -8,6 +8,8 @@ import type { RailGarment } from "@/components/ui/product-rail-gallery";
  * - `backImage` es opcional: sin espalda se muestra el frente al girar la prenda.
  * - `tag` es la etiqueta colgante (por ejemplo "$30"). Sin `tag` no se muestra etiqueta.
  */
+const SIDE_IMAGE = "/tshirts/rail/base-side.png";
+
 export const TSHIRTS: RailGarment[] = [
   {
     id: "gotica",
@@ -16,6 +18,7 @@ export const TSHIRTS: RailGarment[] = [
     details: ["Algodón", "Gris", "Estampado frente y espalda"],
     image: "/tshirts/rail/gotica-front.png",
     backImage: "/tshirts/rail/gotica-back.png",
+    sideImage: SIDE_IMAGE,
   },
   {
     id: "samurai",
@@ -24,6 +27,7 @@ export const TSHIRTS: RailGarment[] = [
     details: ["Algodón", "Gris", "Estampado frente y espalda"],
     image: "/tshirts/rail/samurai-front.png",
     backImage: "/tshirts/rail/samurai-back.png",
+    sideImage: SIDE_IMAGE,
   },
   {
     id: "plastilina",
@@ -32,6 +36,7 @@ export const TSHIRTS: RailGarment[] = [
     details: ["Algodón", "Gris", "Estampado frente y espalda"],
     image: "/tshirts/rail/plastilina-front.png",
     backImage: "/tshirts/rail/plastilina-back.png",
+    sideImage: SIDE_IMAGE,
   },
   {
     id: "amarillo",
@@ -39,5 +44,6 @@ export const TSHIRTS: RailGarment[] = [
     description: "Camiseta gris con el diablo y “Callate y corre” en amarillo.",
     details: ["Algodón", "Gris", "Estampado al frente"],
     image: "/tshirts/rail/amarillo-front.png",
+    sideImage: SIDE_IMAGE,
   },
 ];

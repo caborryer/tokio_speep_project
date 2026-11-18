@@ -26,7 +26,7 @@ export default function CamisetasPage() {
         <div className={v.railBox}>
           <ClothingRailHero
             items={TSHIRTS}
-            hanger="matte"
+            hanger="none"
             labels={LABELS}
             caption="Pasa el cursor por el riel, arrastra una percha y toca una pieza para ver la espalda."
             action={

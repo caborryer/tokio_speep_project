@@ -52,6 +52,8 @@ test.describe("menú y páginas nuevas", () => {
     await expect(page.getByRole("heading", { name: "Camisetas" })).toBeVisible();
     const pieces = page.locator("[data-garment]");
     await expect(pieces).toHaveCount(4);
+    await expect(page.locator("[data-garment] [data-face='side'] img")).toHaveCount(4);
+    await expect(page.locator("[data-garment] [data-face='front'] svg path")).toHaveCount(0);
     await pieces.first().focus();
     await page.keyboard.press("ArrowRight");
     await expect(pieces.nth(1)).toBeFocused();
