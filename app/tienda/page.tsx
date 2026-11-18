@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { Lines } from "@/components/scene/Lorem";
 import Scene from "@/components/scene/Scene";
 import v from "@/components/scene/Views.module.css";
-import { STORE_CATEGORIES, STORE_URL, categoryHref } from "@/lib/store";
+import { STORE_CATEGORIES, STORE_URL, categoryTarget } from "@/lib/store";
 
 export const metadata: Metadata = {
   title: "Tienda | El Reto 500 Kilómetros",
@@ -27,7 +28,7 @@ export default function TiendaPage() {
 
         <ul className={v.shopGrid}>
           {STORE_CATEGORIES.map((c) => {
-            const href = categoryHref(c);
+            const target = categoryTarget(c);
             const inner = (
               <>
                 <span className={v.shopImg}>
@@ -39,13 +40,17 @@ export default function TiendaPage() {
                 </span>
                 <span className={v.shopName}>{c.name}</span>
                 <span className={v.shopNote}>{c.blurb}</span>
-                {!href && <span className={v.shopSoon}>Próximamente</span>}
+                {target.kind === "none" && <span className={v.shopSoon}>Próximamente</span>}
               </>
             );
             return (
               <li key={c.id}>
-                {href ? (
-                  <a className={v.shopCard} href={href} target="_blank" rel="noopener noreferrer">
+                {target.kind === "internal" ? (
+                  <Link className={v.shopCard} href={target.href}>
+                    {inner}
+                  </Link>
+                ) : target.kind === "external" ? (
+                  <a className={v.shopCard} href={target.href} target="_blank" rel="noopener noreferrer">
                     {inner}
                   </a>
                 ) : (

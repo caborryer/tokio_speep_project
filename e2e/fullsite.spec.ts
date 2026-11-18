@@ -8,7 +8,7 @@ const noVerticalScroll = (page: import("@playwright/test").Page) =>
 
 test.describe("menú y páginas nuevas", () => {
   test("el menú es idéntico en la home y en todas las vistas (sale de lib/navLinks.ts)", async ({ page }) => {
-    for (const path of ["/", "/reto", "/dona", "/manu", "/marcas", "/road-to-500", "/tienda", "/aliados"]) {
+    for (const path of ["/", "/reto", "/dona", "/manu", "/marcas", "/road-to-500", "/tienda", "/tienda/camisetas", "/aliados"]) {
       await page.goto(path);
       const nav = page.getByRole("navigation", { name: "Principal" });
       await expect(nav.getByRole("link"), path).toHaveText(NAV_LINKS.map((l) => l.label));
@@ -31,6 +31,44 @@ test.describe("menú y páginas nuevas", () => {
       await expect(page.getByText(n, { exact: true }).first()).toBeVisible();
     }
     expect(await noVerticalScroll(page)).toBe(true);
+  });
+
+  test("clic en Camisetas lleva a /tienda/camisetas en la misma pestaña; Posters sigue en 'Próximamente'", async ({ page, context }) => {
+    await page.goto("/tienda");
+    const card = page.getByRole("link", { name: /Camisetas/ });
+    await expect(card).not.toHaveAttribute("target", "_blank");
+    await expect(page.getByText("Posters", { exact: true }).first()).toBeVisible();
+    await expect(page.locator("[aria-disabled=true]").filter({ hasText: "Posters" }).getByText("Próximamente")).toBeVisible();
+    await card.click();
+    await expect(page).toHaveURL(/\/tienda\/camisetas$/);
+    expect(context.pages()).toHaveLength(1);
+  });
+
+  test("/tienda/camisetas: riel con 4 piezas, detalle frente/espalda, teclado y regreso", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(String(e)));
+    await page.goto("/tienda/camisetas");
+    await expect(page).toHaveTitle("Camisetas | El Reto 500 Kilómetros");
+    await expect(page.getByRole("heading", { name: "Camisetas" })).toBeVisible();
+    const pieces = page.locator("[data-garment]");
+    await expect(pieces).toHaveCount(4);
+    await pieces.first().focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(pieces.nth(1)).toBeFocused();
+    await page.keyboard.press("Enter");
+    const dialog = page.getByRole("dialog", { name: "Samurái" });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Cerrar" })).toBeFocused();
+    await expect(dialog.getByRole("button", { name: "Frente" })).toBeVisible();
+    await dialog.getByRole("button", { name: "Espalda" }).click();
+    await expect(dialog.getByRole("button", { name: "Espalda" })).toHaveAttribute("aria-pressed", "true");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(pieces.nth(1)).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    await page.getByRole("link", { name: /Tienda/ }).filter({ hasText: "←" }).click();
+    await expect(page).toHaveURL(/\/tienda$/);
+    expect(errors).toEqual([]);
   });
 
   test("/aliados muestra las marcas y la tarjeta 'Tu marca aquí' lleva a /marcas", async ({ page }) => {

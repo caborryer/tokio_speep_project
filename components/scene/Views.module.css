@@ -1094,3 +1094,54 @@ a.shopCta:focus-visible {
     font-size: clamp(22px, 7vw, 34px);
   }
 }
+
+/* =====================================================================
+   TIENDA / CAMISETAS (riel de ropa)
+   ===================================================================== */
+.railBack {
+  position: absolute;
+  left: calc(var(--ux) * 296);
+  top: calc(var(--uy) * 285);
+  font-size: calc(var(--u) * 26);
+  padding: calc(var(--u) * 10) calc(var(--u) * 16);
+  transform: rotate(-1deg);
+  transition: transform 0.15s ease;
+}
+.railBack:hover,
+.railBack:focus-visible {
+  transform: rotate(0deg) scale(1.04);
+}
+.railBox {
+  position: absolute;
+  left: calc(var(--ux) * 296);
+  top: calc(var(--uy) * 350);
+  width: calc(var(--ux) * 1490);
+  max-height: calc(var(--uy) * 640);
+}
+.railCta {
+  font-size: calc(var(--u) * 26);
+  padding: calc(var(--u) * 12) calc(var(--u) * 18);
+  text-decoration: none;
+}
+
+@container (max-width: 899px) and (max-aspect-ratio: 1/1) {
+  .railBack,
+  .railBox {
+    position: static;
+  }
+  .railBack {
+    align-self: flex-start;
+    margin: 4px var(--m);
+    font-size: clamp(14px, 4.2vw, 19px);
+    padding: 8px 12px;
+  }
+  .railBox {
+    width: auto;
+    max-height: none;
+    margin: 0 var(--m);
+  }
+  .railCta {
+    font-size: clamp(14px, 4.2vw, 19px);
+    padding: 9px 12px;
+  }
+}

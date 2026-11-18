@@ -11,7 +11,7 @@ test.describe("prelanzamiento", () => {
   });
 
   test("las demás rutas redirigen a /", async ({ page }) => {
-    for (const path of ["/reto", "/dona", "/manu", "/marcas", "/road-to-500", "/aliados", "/tienda", "/juego"]) {
+    for (const path of ["/reto", "/dona", "/manu", "/marcas", "/road-to-500", "/aliados", "/tienda", "/tienda/camisetas", "/juego"]) {
       await page.goto(path);
       await expect(page).toHaveURL(/\/$/);
     }

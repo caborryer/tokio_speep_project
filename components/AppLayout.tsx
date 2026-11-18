@@ -27,13 +27,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {!isHome && (
       <header className="app-header" style={{ zIndex: 60 }}>
         <div className="header-logo-container" style={{ position: 'relative', zIndex: 60 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', lineHeight: '1', color: 'var(--text-primary)' }}>
+          {/* <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', lineHeight: '1', color: 'var(--text-primary)' }}>
             <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
               THE<br />
               <span style={{ fontSize: '1.4rem' }}>500 KM</span><br />
               PROJECT
             </Link>
-          </div>
+          </div> */}
           <button 
             className="hidden-desktop" 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -44,7 +44,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Desktop Nav */}
-        <nav className="app-nav hidden-mobile">
+        {/* <nav className="app-nav hidden-mobile">
           <Link href="/reto" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>EL RETO</Link>
           <Link href="/manu" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>MANU</Link>
           <Link href="/dona" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '1px' }}>DONA UN KM</Link>
@@ -62,7 +62,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           }}>
             COMPRA AHORA
           </Link>
-        </nav>
+        </nav> */}
       </header>
       )}
       
